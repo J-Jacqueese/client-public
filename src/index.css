@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans SC', 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1320px;
+    }
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+}
+
+.code-font {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.text-gradient-ocean {
+  background: linear-gradient(135deg, #0284c7, #2563eb, #4f46e5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-ocean {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fff;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.card-ocean:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-3px);
+}
+
+.shadow-ocean {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.07), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-ocean-lg {
+  box-shadow: 0 8px 40px rgba(59, 130, 246, 0.12), 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.section-alt {
+  background: linear-gradient(180deg, #f2f6fb, #f8fafc);
+}
+
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.tag-pill {
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.tag-pill:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.tag-active {
+  background-color: #3b82f6 !important;
+  color: #fff !important;
+  border-color: #3b82f6 !important;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.55);
+}

@@ -1,0 +1,116 @@
+import { motion } from 'framer-motion';
+import { Github, Twitter, MessageSquare, ExternalLink } from 'lucide-react';
+import logo from '../../WechatIMG1177.jpg';
+
+const footerLinks = [
+  {
+    title: '生态平台',
+    links: [
+      { label: '模型库', href: 'http://dpsk.ai/#/models' },
+      { label: '应用榜', href: 'http://dpsk.ai/#/apps' },
+      { label: '开源社区', href: 'https://deepseek.club/' },
+    ],
+  },
+  {
+    title: '社区版块',
+    links: [
+      { label: '行业动态', href: 'https://deepseek.club/' },
+      { label: '模型发布', href: 'https://deepseek.club/' },
+      { label: '论文解读', href: 'https://deepseek.club/' },
+      { label: '新手入门', href: 'https://deepseek.club/' },
+    ],
+  },
+  {
+    title: '资源',
+    links: [
+      { label: 'DeepSeek 官方', href: 'https://www.deepseek.com/' },
+      { label: 'API 文档', href: 'https://platform.deepseek.com/' },
+      { label: 'GitHub', href: 'https://github.com/deepseek-ai' },
+    ],
+  },
+];
+
+export default function Footer() {
+  return (
+    <footer className="border-t border-slate-200 bg-white">
+      <div className="container py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.45 }}
+            className="lg:col-span-2"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <img src={logo} alt="dpsk.ai" className="h-11 w-auto object-contain" />
+              <div>
+                <span className="font-bold text-slate-900 text-sm block leading-tight">深求社区</span>
+                <span className="font-mono text-blue-500/60 text-[10px] tracking-widest">DEEPSEEK.CLUB</span>
+              </div>
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-sm">
+              共建全球最大的第三方 DeepSeek 开源生态社区。科技向善，仝创未来！
+            </p>
+            <div className="flex items-center gap-2.5">
+              <a
+                href="https://github.com/deepseek-ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+              <a
+                href="https://deepseek.club/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </a>
+              <a
+                href="#"
+                className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
+              >
+                <Twitter className="w-4 h-4" />
+              </a>
+            </div>
+          </motion.div>
+
+          {footerLinks.map((group, index) => (
+            <motion.div
+              key={group.title}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.4, delay: 0.05 * index }}
+            >
+              <h4 className="font-semibold text-slate-900 text-sm mb-4">{group.title}</h4>
+              <ul className="space-y-2.5">
+                {group.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1 group"
+                    >
+                      {link.label}
+                      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-slate-500">&copy; {new Date().getFullYear()} 深求社区 DeepSeek.Club</p>
+          <p className="text-xs text-slate-400 font-mono">Built with passion for open source</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
