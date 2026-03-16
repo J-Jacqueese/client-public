@@ -15,6 +15,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { appAPI } from '../services/api';
+import { showGlobalToast } from '../components/GlobalToast';
 
 export default function AppDetailPage() {
   const { id } = useParams();
@@ -23,12 +24,12 @@ export default function AppDetailPage() {
   const [loading, setLoading] = useState(true);
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [activeTab, setActiveTab] = useState('detail');
+  const [copiedDownloadKey, setCopiedDownloadKey] = useState('');
 
   useEffect(() => {
     loadApp();
-    // 检查是否已经点赞过
     const upvotedApps = JSON.parse(localStorage.getItem('upvotedApps') || '[]');
-    setHasUpvoted(upvotedApps.includes(id));
+    setHasUpvoted(upvotedApps.includes(String(id)));
   }, [id]);
 
   const loadApp = async () => {
@@ -43,25 +44,64 @@ export default function AppDetailPage() {
     }
   };
 
-  const handleUpvote = async () => {
-    if (hasUpvoted) {
-      alert('您已经为这个应用点赞了');
+  const handleToggleUpvote = () => {
+    const appId = String(id);
+    const upvotedApps = JSON.parse(localStorage.getItem('upvotedApps') || '[]');
+    const hasLiked = upvotedApps.includes(appId);
+
+    if (hasLiked) {
+      const next = upvotedApps.filter((savedId) => savedId !== appId);
+      localStorage.setItem('upvotedApps', JSON.stringify(next));
+      setHasUpvoted(false);
       return;
     }
-    
+
+    upvotedApps.push(appId);
+    localStorage.setItem('upvotedApps', JSON.stringify(upvotedApps));
+    setHasUpvoted(true);
+  };
+
+  const copyToClipboard = async (text) => {
+    if (!text) return false;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const copied = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    return copied;
+  };
+
+  const handleCopyDownloadLink = async (url, key = 'primary') => {
+    if (!url) return;
+
     try {
-      await appAPI.upvote(id);
-      setApp({ ...app, upvotes: (app.upvotes || 0) + 1 });
-      
-      // 保存到 localStorage
-      const upvotedApps = JSON.parse(localStorage.getItem('upvotedApps') || '[]');
-      upvotedApps.push(id);
-      localStorage.setItem('upvotedApps', JSON.stringify(upvotedApps));
-      setHasUpvoted(true);
+      const copied = await copyToClipboard(url);
+      if (!copied) throw new Error('Copy command failed');
+
+      setCopiedDownloadKey(key);
+      showGlobalToast('下载地址已复制到剪切板', 'success');
+      window.setTimeout(() => {
+        setCopiedDownloadKey((prev) => (prev === key ? '' : prev));
+      }, 1800);
     } catch (error) {
-      console.error('Failed to upvote app:', error);
+      console.error('Failed to copy download link:', error);
+      showGlobalToast('复制失败，请手动复制链接', 'error');
     }
   };
+
+  const displayUpvotes = Math.max(0, (app?.upvotes || 0) + (hasUpvoted ? 1 : 0));
+  const downloadLinks = Array.isArray(app?.download_links) ? app.download_links.filter((link) => link?.url) : [];
+  const primaryDownloadUrl = downloadLinks[0]?.url || app?.download_url || '';
 
   if (loading) {
     return (
@@ -142,7 +182,7 @@ export default function AppDetailPage() {
               <div className="flex items-center gap-6 text-sm">
                 <div className="flex items-center gap-1.5 text-slate-600">
                   <Heart className={`w-4 h-4 ${hasUpvoted ? 'text-rose-500 fill-rose-500' : 'text-slate-400'}`} />
-                  <span className="font-semibold text-slate-800">{(app.upvotes || 0).toLocaleString()}</span>
+                  <span className="font-semibold text-slate-800">{displayUpvotes.toLocaleString()}</span>
                   <span className="text-slate-400">点赞</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-600">
@@ -165,20 +205,18 @@ export default function AppDetailPage() {
                   访问官网
                 </a>
               )}
-              {app.download_url && (
-                <a
-                  href={app.download_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              {primaryDownloadUrl && (
+                <button
+                  type="button"
+                  onClick={() => handleCopyDownloadLink(primaryDownloadUrl, 'primary')}
                   className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:border-blue-300 hover:text-blue-600 transition-all"
                 >
                   <Download className="w-4 h-4" />
-                  下载应用
-                </a>
+                  {copiedDownloadKey === 'primary' ? '已复制链接' : '下载应用'}
+                </button>
               )}
               <button
-                onClick={handleUpvote}
-                disabled={hasUpvoted}
+                onClick={handleToggleUpvote}
                 className={`flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl border transition-all ${
                   hasUpvoted
                     ? 'bg-rose-50 text-rose-600 border-rose-200'
@@ -186,7 +224,7 @@ export default function AppDetailPage() {
                 }`}
               >
                 <Heart className={`w-4 h-4 ${hasUpvoted ? 'fill-rose-500' : ''}`} />
-                {hasUpvoted ? '已点赞' : '点赞支持'}
+                {hasUpvoted ? '取消点赞' : '点赞支持'}
               </button>
               <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:border-blue-300 hover:text-blue-600 transition-all">
                 <Share2 className="w-4 h-4" />
@@ -219,8 +257,18 @@ export default function AppDetailPage() {
             <MessageSquare className="w-4 h-4" />
             用户讨论
           </button>
+          <button
+            onClick={() => setActiveTab('download')}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === 'download'
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+            }`}
+          >
+            <Download className="w-4 h-4" />
+            下载应用
+          </button>
         </div>
-
         {activeTab === 'detail' && (
           <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 shadow-sm">
             <div className="prose prose-slate prose-sm max-w-none">
@@ -287,6 +335,39 @@ export default function AppDetailPage() {
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'download' && (
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 shadow-sm">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">下载地址</h3>
+            {downloadLinks.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {downloadLinks.map((link, index) => (
+                  <button
+                    type="button"
+                    key={`${link.type || 'download'}-${index}`}
+                    onClick={() => handleCopyDownloadLink(link.url, `download-${index}`)}
+                    className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center">
+                      <Download className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                        {copiedDownloadKey === `download-${index}` ? '已复制链接' : link.type || `下载地址 ${index + 1}`}
+                      </div>
+                      <div className="text-xs text-slate-500 truncate">{link.url}</div>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
+                <p className="text-sm text-slate-500">暂未配置下载地址</p>
+              </div>
+            )}
           </div>
         )}
       </div>

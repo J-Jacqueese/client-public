@@ -56,6 +56,51 @@ const hotTopics = [
     time: '42 分钟前',
     hot: false,
   },
+  {
+    title: '从 0 到 1 搭建 DeepSeek 私有知识库检索系统',
+    category: 'AI应用案例',
+    categoryColor: 'text-amber-600',
+    replies: 14,
+    views: 930,
+    time: '1 小时前',
+    hot: true,
+  },
+  {
+    title: 'DeepSeek R1 法律助手在真实合同审核中的踩坑总结',
+    category: '行业动态与观点',
+    categoryColor: 'text-orange-600',
+    replies: 7,
+    views: 512,
+    time: '2 小时前',
+    hot: false,
+  },
+  {
+    title: '新手 7 天上手 DeepSeek：环境配置 + API 调用实战',
+    category: '新手入门(Q&A)',
+    categoryColor: 'text-emerald-600',
+    replies: 23,
+    views: 1280,
+    time: '3 小时前',
+    hot: false,
+  },
+  {
+    title: '从 Kaggle 到生产：实战部署 DeepSeek 模型全流程',
+    category: 'AI应用案例',
+    categoryColor: 'text-amber-600',
+    replies: 18,
+    views: 1540,
+    time: '5 小时前',
+    hot: true,
+  },
+  {
+    title: '大厂工程师分享：如何在企业内部安全落地大模型',
+    category: '行业动态与观点',
+    categoryColor: 'text-orange-600',
+    replies: 11,
+    views: 980,
+    time: '6 小时前',
+    hot: false,
+  }
 ];
 
 export default function CommunitySection() {

@@ -84,7 +84,7 @@ export default function AppsPage() {
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
             应用榜 <span className="text-gradient-ocean">App Ranking</span>
           </h1>
-          <p className="text-slate-600 text-sm max-w-xl">发现基于 DeepSeek 模型构建的优秀应用，支持点赞投票</p>
+          <p className="text-slate-600 text-sm max-w-xl">发现基于DeepSeek等国内外开源模型构建的优秀AI应用，支持点赞投票</p>
         </div>
       </div>
 

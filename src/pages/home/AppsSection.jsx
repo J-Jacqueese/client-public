@@ -9,37 +9,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
-
-const hotApps = [
-  {
-    rank: 1,
-    name: 'DeepSeek Chat',
-    desc: '官方对话助手，支持深度推理与代码生成',
-    category: 'AI 助手',
-    votes: 12800,
-    trend: '+23%',
-    isHot: true,
-  },
-  {
-    rank: 2,
-    name: 'OpenClaw',
-    desc: '开源 AI Agent 框架，一键部署智能助手',
-    category: 'Agent 框架',
-    votes: 9650,
-    trend: '+45%',
-    isHot: true,
-  },
-  {
-    rank: 3,
-    name: 'DS-Coder IDE',
-    desc: '基于 DeepSeek-Coder 的智能编程环境',
-    category: '开发工具',
-    votes: 7420,
-    trend: '+18%',
-    isHot: false,
-  },
-];
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { appAPI, commonAPI } from '../../services/api';
 
 function getRankStyle(rank) {
   if (rank === 1)
@@ -55,7 +26,75 @@ export default function AppsSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const [activeTab, setActiveTab] = useState('全部');
-  const appCategories = ['全部', 'AI 助手', 'Agent 框架', '开发工具', '教育', '企业工具'];
+  const [apps, setApps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    loadApps();
+    loadCategories();
+  }, []);
+
+  const loadApps = async () => {
+    setLoading(true);
+    try {
+      const response = await appAPI.getAll({ sort: 'upvotes' });
+      const data = response?.data?.data;
+      if (Array.isArray(data)) {
+        setApps(
+          data.filter(
+            (item) =>
+              item &&
+              (typeof item.id === 'number' || typeof item.id === 'string'),
+          ),
+        );
+      } else {
+        setApps([]);
+      }
+    } catch (error) {
+      console.error('Failed to load apps for homepage:', error);
+      setApps([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const response = await commonAPI.getCategories('app');
+      const data = response?.data?.data;
+      if (Array.isArray(data)) {
+        setCategories(data);
+      } else {
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error('Failed to load app categories for homepage:', error);
+      setCategories([]);
+    }
+  };
+
+  const filteredApps = useMemo(() => {
+    if (!apps || apps.length === 0) return [];
+    if (activeTab === '全部') return apps;
+    return apps.filter((app) => (app.category_name || '其他') === activeTab);
+  }, [apps, activeTab]);
+
+  const hotApps = useMemo(
+    () => filteredApps.slice(0, 6),
+    [filteredApps],
+  );
+
+  const newApps = useMemo(() => {
+    if (!apps || apps.length === 0) return [];
+    return [...apps]
+      .sort(
+        (a, b) =>
+          new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime(),
+      )
+      .slice(0, 3);
+  }, [apps]);
 
   return (
     <section id="apps" className="relative py-20" ref={ref}>
@@ -97,7 +136,7 @@ export default function AppsSection() {
           transition={{ delay: 0.15, duration: 0.5 }}
           className="flex flex-wrap gap-2 mb-8"
         >
-          {appCategories.map((cat) => (
+          {['全部', ...categories.map((c) => c.name)].map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveTab(cat)}
@@ -114,53 +153,66 @@ export default function AppsSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2 space-y-3">
-            {hotApps.map((app, index) => (
-              <motion.a
-                key={app.name}
-                href="http://dpsk.ai/#/apps"
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, x: -20 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.25 + index * 0.07, duration: 0.45 }}
-                className="group flex items-center gap-4 p-4 rounded-xl card-ocean"
-              >
-                <div
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center font-mono font-bold text-sm shrink-0 ${getRankStyle(
-                    app.rank,
-                  )}`}
-                >
-                  {app.rank}
-                </div>
+            {loading ? (
+              <div className="text-center text-slate-400 text-sm py-6">应用加载中...</div>
+            ) : hotApps.length === 0 ? (
+              <div className="text-center text-slate-400 text-sm py-6">暂无应用数据</div>
+            ) : (
+              hotApps.map((app, index) => {
+                const upvotes = app.upvotes || 0;
+                const trend = `+${Math.min(99, upvotes % 50)}%`;
+                const rank = index + 1;
+                const isHot = index < 2 || upvotes > 100;
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <h3 className="font-semibold text-slate-900 text-sm truncate group-hover:text-blue-600 transition-colors">
-                      {app.name}
-                    </h3>
-                    {app.isHot && <Flame className="w-3.5 h-3.5 text-orange-500 shrink-0" />}
-                  </div>
-                  <p className="text-xs text-slate-500 truncate">{app.desc}</p>
-                </div>
+                return (
+                  <motion.a
+                    key={app.id}
+                    href={`#/apps/${app.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={inView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ delay: 0.25 + index * 0.07, duration: 0.45 }}
+                    className="group flex items-center gap-4 p-4 rounded-xl card-ocean"
+                  >
+                    <div
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center font-mono font-bold text-sm shrink-0 ${getRankStyle(
+                        rank,
+                      )}`}
+                    >
+                      {rank}
+                    </div>
 
-                <span className="hidden sm:block text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 border border-slate-100 shrink-0">
-                  {app.category}
-                </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="font-semibold text-slate-900 text-sm truncate group-hover:text-blue-600 transition-colors">
+                          {app.name}
+                        </h3>
+                        {isHot && <Flame className="w-3.5 h-3.5 text-orange-500 shrink-0" />}
+                      </div>
+                      <p className="text-xs text-slate-500 truncate">{app.description || '暂无描述'}</p>
+                    </div>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className="flex items-center gap-1 text-xs text-slate-500">
-                    <ThumbsUp className="w-3 h-3" />
-                    {app.votes.toLocaleString()}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-emerald-600 font-mono">
-                    <TrendingUp className="w-3 h-3" />
-                    {app.trend}
-                  </span>
-                </div>
+                    <span className="hidden sm:block text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 border border-slate-100 shrink-0">
+                      {app.category_name || '其他'}
+                    </span>
 
-                <ExternalLink className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors shrink-0" />
-              </motion.a>
-            ))}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="flex items-center gap-1 text-xs text-slate-500">
+                        <ThumbsUp className="w-3 h-3" />
+                        {upvotes.toLocaleString()}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-emerald-600 font-mono">
+                        <TrendingUp className="w-3 h-3" />
+                        {trend}
+                      </span>
+                    </div>
+
+                    <ExternalLink className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors shrink-0" />
+                  </motion.a>
+                );
+              })
+            )}
           </div>
 
           <motion.div
@@ -196,17 +248,35 @@ export default function AppsSection() {
                 <h3 className="font-semibold text-slate-900 text-sm">新上线应用</h3>
               </div>
               <div className="space-y-3">
-                {['AI 论文助手', '智能客服 Bot', '数据可视化平台'].map((name, i) => (
-                  <div key={name} className="flex items-center gap-3 group cursor-pointer">
-                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-100 flex items-center justify-center text-xs font-mono text-sky-500">
-                      {i + 1}
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-600 group-hover:text-blue-600 transition-colors">{name}</span>
-                      <span className="block text-[10px] text-slate-500">刚刚上线</span>
-                    </div>
-                  </div>
-                ))}
+                {loading ? (
+                  <div className="text-xs text-slate-400">加载中...</div>
+                ) : newApps.length === 0 ? (
+                  <div className="text-xs text-slate-400">暂无数据</div>
+                ) : (
+                  newApps.map((app, i) => (
+                    <a
+                      key={app.id}
+                      href={`#/apps/${app.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 group cursor-pointer"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-100 flex items-center justify-center text-xs font-mono text-sky-500">
+                        {i + 1}
+                      </div>
+                      <div>
+                        <span className="text-sm text-slate-600 group-hover:text-blue-600 transition-colors">
+                          {app.name}
+                        </span>
+                        <span className="block text-[10px] text-slate-500">
+                          {app.created_at
+                            ? new Date(app.created_at).toLocaleDateString('zh-CN').slice(5)
+                            : '刚刚上线'}
+                        </span>
+                      </div>
+                    </a>
+                  ))
+                )}
               </div>
             </div>
           </motion.div>

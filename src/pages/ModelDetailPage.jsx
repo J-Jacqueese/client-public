@@ -19,6 +19,41 @@ import {
 } from 'lucide-react';
 import { modelAPI } from '../services/api';
 
+const MODEL_TYPE_META = {
+  hot: {
+    label: '热门',
+    className: 'bg-rose-50 text-rose-600 border-rose-200',
+  },
+  latest: {
+    label: '最新',
+    className: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  },
+  recommended: {
+    label: '推荐',
+    className: 'bg-blue-50 text-blue-600 border-blue-200',
+  },
+  official: {
+    label: '官方',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
+  },
+  热门: {
+    label: '热门',
+    className: 'bg-rose-50 text-rose-600 border-rose-200',
+  },
+  最新: {
+    label: '最新',
+    className: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  },
+  推荐: {
+    label: '推荐',
+    className: 'bg-blue-50 text-blue-600 border-blue-200',
+  },
+  官方: {
+    label: '官方',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
+  },
+};
+
 export default function ModelDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -100,6 +135,11 @@ export default function ModelDetailPage() {
     );
   }
 
+  const modelTypeMeta = MODEL_TYPE_META[model?.model_type];
+  const modelImage = model?.icon_bg || model?.avatar || model?.logo || model?.icon || model?.image;
+  const modelTags = Array.isArray(model?.tags) ? model.tags : [];
+  const downloadLinks = Array.isArray(model?.download_links) ? model.download_links : [];
+
   return (
     <div className="pt-16">
       <div className="bg-gradient-to-b from-blue-50/80 to-transparent">
@@ -122,13 +162,41 @@ export default function ModelDetailPage() {
         <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-start gap-6">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
-                  <Cpu className="w-6 h-6 text-white" />
+              <div className="flex items-start gap-4 mb-5">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-slate-100 shadow-sm bg-slate-50">
+                  {modelImage ? (
+                    <img src={modelImage} alt={model.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Cpu className="w-7 h-7 text-slate-300" />
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900 font-mono">{model.name}</h1>
-                  <p className="text-sm text-slate-500">{model.description}</p>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="text-2xl font-bold text-slate-900 font-mono break-words">{model.name}</h1>
+                    {modelTypeMeta && (
+                      <span className={`text-xs font-medium px-3 py-1 rounded-full border ${modelTypeMeta.className}`}>
+                        {modelTypeMeta.label}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-slate-600 mt-1">{model.description}</p>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {model.category_name && (
+                      <span className="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium border border-blue-100">
+                        {model.category_name}
+                      </span>
+                    )}
+                    {modelTags.slice(0, 8).map((tag) => (
+                      <span
+                        key={typeof tag === 'string' ? tag : tag?.name}
+                        className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 border border-slate-100"
+                      >
+                        {typeof tag === 'string' ? tag : tag?.name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -175,9 +243,9 @@ export default function ModelDetailPage() {
             </div>
 
             <div className="flex flex-col gap-3 lg:w-48 shrink-0">
-              {model.download_links && model.download_links.length > 0 ? (
+              {downloadLinks.length > 0 ? (
                 <button
-                  onClick={() => handleDownload(model.download_links[0])}
+                  onClick={() => handleDownload(downloadLinks[0])}
                   className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20"
                 >
                   <Github className="w-4 h-4" />
@@ -261,16 +329,51 @@ export default function ModelDetailPage() {
                 </div>
               )}
             </div>
+            {downloadLinks.length > 0 && (
+              <div className="mt-8 pt-6 border-t border-slate-100">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">下载与部署</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {downloadLinks.slice(0, 6).map((link, idx) => {
+                    const url = typeof link === 'string' ? link : link?.url;
+                    const label = typeof link === 'string' ? '下载链接' : link?.name || link?.title || link?.type || '下载链接';
+                    const isGithub = typeof url === 'string' && url.toLowerCase().includes('github.com');
+                    return (
+                      <button
+                        key={`${url || 'link'}-${idx}`}
+                        type="button"
+                        onClick={() => handleDownload(link)}
+                        className="text-left flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all group"
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isGithub ? 'bg-slate-900' : 'bg-blue-500'}`}>
+                          {isGithub ? (
+                            <Github className="w-5 h-5 text-white" />
+                          ) : (
+                            <Download className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors truncate">
+                            {label}
+                          </div>
+                          <div className="text-xs text-slate-500 truncate">{url || ''}</div>
+                        </div>
+                        <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors shrink-0" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === 'files' && (
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="bg-slate-50 px-6 py-3 text-xs font-bold text-slate-400 flex justify-between uppercase tracking-widest">
-              <span>文件名</span>
-              <div className="flex space-x-20">
-                <span>大小</span>
-                <span>下载</span>
+            <div className="bg-slate-50 px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <div className="grid grid-cols-[minmax(0,1fr)_72px_56px] sm:grid-cols-[minmax(0,1fr)_96px_64px] items-center gap-3">
+                <span>文件名</span>
+                <span className="text-right">大小</span>
+                <span className="text-right">下载</span>
               </div>
             </div>
             <div className="divide-y divide-slate-50">
@@ -278,18 +381,26 @@ export default function ModelDetailPage() {
                 model.files.map((file, index) => (
                   <div
                     key={index}
-                    className="px-6 py-4 flex justify-between items-center text-sm font-mono hover:bg-slate-50 transition-colors"
+                    className="px-6 py-4 hover:bg-slate-50 transition-colors"
                   >
-                    <span className="flex items-center">
-                      <FileText className="w-4 h-4 mr-3 text-slate-300" /> {file.name}
-                    </span>
-                    <div className="flex space-x-12 items-center">
-                      <span className="text-slate-400">{file.size}</span>
-                      {model.download_links && model.download_links.length > 0 && (
-                        <button onClick={() => handleDownload(model.download_links[0])} className="text-blue-600 hover:text-blue-700">
-                          <Download className="w-5 h-5" />
-                        </button>
-                      )}
+                    <div className="grid grid-cols-[minmax(0,1fr)_72px_56px] sm:grid-cols-[minmax(0,1fr)_96px_64px] items-center gap-3 text-sm font-mono">
+                      <span className="flex items-center min-w-0">
+                        <FileText className="w-4 h-4 mr-3 text-slate-300 shrink-0" />
+                        <span className="truncate">{file.name}</span>
+                      </span>
+                      <span className="text-slate-400 text-right truncate">{file.size}</span>
+                      <div className="text-right">
+                        {downloadLinks.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownload(downloadLinks[0])}
+                            className="inline-flex items-center justify-center text-blue-600 hover:text-blue-700"
+                            aria-label="下载"
+                          >
+                            <Download className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))

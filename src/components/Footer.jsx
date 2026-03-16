@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { Github, Twitter, MessageSquare, ExternalLink } from 'lucide-react';
 import logo from '../../WechatIMG1177.jpg';
 
+const DEEPSEEK_CLUB_LOGO = 'https://deepseek.club/uploads/default/original/1X/6273b6258641ff27b15ee0a9585d524d0d774de5.png';
+
 const footerLinks = [
   {
     title: '生态平台',
@@ -14,10 +16,10 @@ const footerLinks = [
   {
     title: '社区版块',
     links: [
-      { label: '行业动态', href: 'https://deepseek.club/' },
-      { label: '模型发布', href: 'https://deepseek.club/' },
-      { label: '论文解读', href: 'https://deepseek.club/' },
-      { label: '新手入门', href: 'https://deepseek.club/' },
+      { label: '行业动态', href: 'https://deepseek.club/c/17-category/17' },
+      { label: '模型发布', href: 'https://deepseek.club/c/11-category/11' },
+      { label: '论文解读', href: 'https://deepseek.club/c/12-category/12' },
+      { label: '新手入门', href: 'https://deepseek.club/c/2-category/2' },
     ],
   },
   {
@@ -42,12 +44,13 @@ export default function Footer() {
             transition={{ duration: 0.45 }}
             className="lg:col-span-2"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <img src={logo} alt="dpsk.ai" className="h-11 w-auto object-contain" />
-              <div>
-                <span className="font-bold text-slate-900 text-sm block leading-tight">深求社区</span>
-                <span className="font-mono text-blue-500/60 text-[10px] tracking-widest">DEEPSEEK.CLUB</span>
-              </div>
+            <div className="flex items-center gap-4 mb-4">
+              <a href="http://dpsk.ai/#/" target="_blank" rel="noopener noreferrer" className="shrink-0">
+                <img src={logo} alt="dpsk.ai" className="h-11 w-auto object-contain" />
+              </a>
+              <a href="https://deepseek.club/" target="_blank" rel="noopener noreferrer" className="shrink-0">
+                <img src={DEEPSEEK_CLUB_LOGO} alt="DeepSeek.Club" className="h-11 w-auto object-contain" />
+              </a>
             </div>
             <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-sm">
               共建全球最大的第三方 DeepSeek 开源生态社区。科技向善，仝创未来！

@@ -1,11 +1,43 @@
 import { Link } from 'react-router-dom';
 import { Heart, Download, Star, Cpu } from 'lucide-react';
 
+const MODEL_TYPE_META = {
+  hot: {
+    label: '热门',
+    className: 'bg-rose-50 text-rose-600 border-rose-200',
+  },
+  latest: {
+    label: '最新',
+    className: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  },
+  recommended: {
+    label: '推荐',
+    className: 'bg-blue-50 text-blue-600 border-blue-200',
+  },
+  official: {
+    label: '官方',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
+  },
+  热门: {
+    label: '热门',
+    className: 'bg-rose-50 text-rose-600 border-rose-200',
+  },
+  最新: {
+    label: '最新',
+    className: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  },
+  推荐: {
+    label: '推荐',
+    className: 'bg-blue-50 text-blue-600 border-blue-200',
+  },
+  官方: {
+    label: '官方',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
+  },
+};
+
 export default function ModelCard({ model }) {
-  const badgeClass =
-    model?.is_hot || model?.is_recommended
-      ? 'bg-rose-50 text-rose-600 border-rose-200'
-      : 'bg-blue-50 text-blue-600 border-blue-200';
+  const modelTypeMeta = MODEL_TYPE_META[model?.model_type];
 
   return (
     <Link
@@ -26,9 +58,9 @@ export default function ModelCard({ model }) {
             </span>
           </div>
         </div>
-        {model.base_model && (
-          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${badgeClass}`}>
-            {model.base_model}
+        {modelTypeMeta && (
+          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${modelTypeMeta.className}`}>
+            {modelTypeMeta.label}
           </span>
         )}
       </div>

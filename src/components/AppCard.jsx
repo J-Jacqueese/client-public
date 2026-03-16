@@ -1,15 +1,36 @@
 import { Link } from 'react-router-dom';
 import { Heart, Users, TrendingUp, Globe, Download } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AppCard({ app, rank }) {
   const [hasUpvoted, setHasUpvoted] = useState(false);
 
   useEffect(() => {
-    // 检查是否已经点赞过
     const upvotedApps = JSON.parse(localStorage.getItem('upvotedApps') || '[]');
     setHasUpvoted(upvotedApps.includes(String(app.id)));
   }, [app.id]);
+
+  const handleToggleUpvote = (e) => {
+    e.preventDefault();
+    const appId = String(app.id);
+    const upvotedApps = JSON.parse(localStorage.getItem('upvotedApps') || '[]');
+    const hasLiked = upvotedApps.includes(appId);
+
+    if (hasLiked) {
+      const next = upvotedApps.filter((id) => id !== appId);
+      localStorage.setItem('upvotedApps', JSON.stringify(next));
+      setHasUpvoted(false);
+      return;
+    }
+
+    upvotedApps.push(appId);
+    localStorage.setItem('upvotedApps', JSON.stringify(upvotedApps));
+    setHasUpvoted(true);
+  };
+
+  const displayUpvotes = Math.max(0, (app.upvotes || 0) + (hasUpvoted ? 1 : 0));
+  const primaryDownloadUrl =
+    (Array.isArray(app.download_links) && app.download_links.find((link) => link?.url)?.url) || app.download_url;
 
   return (
     <Link
@@ -43,16 +64,15 @@ export default function AppCard({ app, rank }) {
             </div>
 
             <button
-              onClick={(e) => e.preventDefault()}
+              onClick={handleToggleUpvote}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
                 hasUpvoted
                   ? 'bg-rose-50 text-rose-600 border border-rose-200'
                   : 'bg-slate-50 text-slate-500 border border-slate-100 hover:border-rose-200 hover:text-rose-500'
               }`}
-              disabled={hasUpvoted}
             >
               <Heart className={`w-3.5 h-3.5 ${hasUpvoted ? 'fill-rose-500' : ''}`} />
-              {(app.upvotes || 0).toLocaleString()}
+              {displayUpvotes.toLocaleString()}
             </button>
           </div>
 
@@ -79,9 +99,9 @@ export default function AppCard({ app, rank }) {
                 官网
               </a>
             )}
-            {app.download_url && (
+            {primaryDownloadUrl && (
               <a
-                href={app.download_url}
+                href={primaryDownloadUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
