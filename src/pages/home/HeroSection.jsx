@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 const HERO_BG =
   'https://d2xsxph8kpxj0f.cloudfront.net/310519663303298638/ER9yLJ9G8WWDh2VPWc45Ne/whale-hero-v2-3rMZLe3mLquuKvNJDYxs2z.webp';
+const DISCUSS_URL = 'https://discuss.deepseek.club/';
 
 const stats = [
   { icon: Boxes, label: '开源模型', value: 500, suffix: '+', color: 'text-blue-600' },
@@ -118,7 +119,7 @@ export default function HeroSection() {
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                   <a
-                    href="https://deepseek.club/"
+                    href={DISCUSS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-3 bg-white/80 backdrop-blur-sm border border-slate-300 hover:border-blue-400 text-slate-700 hover:text-blue-600 font-semibold rounded-xl transition-all hover:bg-white shadow-sm text-sm"

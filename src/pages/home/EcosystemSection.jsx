@@ -8,6 +8,7 @@ const APPS_IMG =
   'https://d2xsxph8kpxj0f.cloudfront.net/310519663303298638/ER9yLJ9G8WWDh2VPWc45Ne/apps-card-v2-VTVZiDxF3PYu3XDoGz2meb.webp';
 const COMMUNITY_IMG =
   'https://d2xsxph8kpxj0f.cloudfront.net/310519663303298638/ER9yLJ9G8WWDh2VPWc45Ne/community-card-v2-VefKQzwMpXkAACrg27ZJMt.webp';
+const DISCUSS_URL = 'https://discuss.deepseek.club/';
 
 const pillars = [
   {
@@ -36,7 +37,7 @@ const pillars = [
     subtitle: 'Open Source Community',
     desc: '全球开发者、研究者与创新者的聚集地，推动开放协作与技术无界流动',
     image: COMMUNITY_IMG,
-    href: 'https://deepseek.club/',
+    href: DISCUSS_URL,
     gradient: 'from-amber-400 to-orange-400',
     textColor: 'text-amber-600',
   },

@@ -17,15 +17,65 @@ import {
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
+const DISCUSS_URL = 'https://discuss.deepseek.club/';
+
 const categories = [
-  { icon: Flame, label: '行业动态与观点', color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-  { icon: Cpu, label: '模型与技术发布', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
-  { icon: BookOpen, label: '研究论文解读', color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200' },
-  { icon: Wrench, label: '大模型微调', color: 'text-sky-600', bg: 'bg-sky-50 border-sky-200' },
-  { icon: GraduationCap, label: '新手入门(Q&A)', color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
-  { icon: Lightbulb, label: 'AI应用案例', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
-  { icon: FileText, label: '资源下载库', color: 'text-teal-600', bg: 'bg-teal-50 border-teal-200' },
-  { icon: Briefcase, label: '招聘 & 商业合作', color: 'text-rose-600', bg: 'bg-rose-50 border-rose-200' },
+  {
+    icon: Flame,
+    label: '行业动态与观点',
+    href: 'https://discuss.deepseek.club/c/17-category/17',
+    color: 'text-orange-600',
+    bg: 'bg-orange-50 border-orange-200',
+  },
+  {
+    icon: Cpu,
+    label: '模型与技术发布',
+    href: 'https://discuss.deepseek.club/c/17-category/17',
+    color: 'text-blue-600',
+    bg: 'bg-blue-50 border-blue-200',
+  },
+  {
+    icon: BookOpen,
+    label: '研究论文解读',
+    href: 'https://discuss.deepseek.club/c/19-category/19',
+    color: 'text-purple-600',
+    bg: 'bg-purple-50 border-purple-200',
+  },
+  {
+    icon: Wrench,
+    label: '大模型微调',
+    href: 'https://discuss.deepseek.club/c/finetune/6',
+    color: 'text-sky-600',
+    bg: 'bg-sky-50 border-sky-200',
+  },
+  {
+    icon: GraduationCap,
+    label: '新手入门(Q&A)',
+    href: 'https://discuss.deepseek.club/c/2-category/2',
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50 border-emerald-200',
+  },
+  {
+    icon: Lightbulb,
+    label: 'AI应用案例',
+    href: 'https://discuss.deepseek.club/c/2-category/2',
+    color: 'text-amber-600',
+    bg: 'bg-amber-50 border-amber-200',
+  },
+  {
+    icon: FileText,
+    label: '资源下载库',
+    href: 'https://discuss.deepseek.club/c/16-category/16',
+    color: 'text-teal-600',
+    bg: 'bg-teal-50 border-teal-200',
+  },
+  {
+    icon: Briefcase,
+    label: '招聘 & 商业合作',
+    href: 'https://discuss.deepseek.club/c/commercial/9',
+    color: 'text-rose-600',
+    bg: 'bg-rose-50 border-rose-200',
+  },
 ];
 
 const hotTopics = [
@@ -57,30 +107,33 @@ const hotTopics = [
     hot: false,
   },
   {
-    title: '从 0 到 1 搭建 DeepSeek 私有知识库检索系统',
+    title: '融资 8000 万美元!Video Rebirth 领跑 AI视频，Bach 模型剑指工业级基础设施',
+    href: 'https://discuss.deepseek.club/t/topic/1094',
     category: 'AI应用案例',
     categoryColor: 'text-amber-600',
-    replies: 14,
-    views: 930,
-    time: '1 小时前',
+    replies: 0,
+    views: 0,
+    time: '刚刚',
     hot: true,
   },
   {
-    title: 'DeepSeek R1 法律助手在真实合同审核中的踩坑总结',
+    title: '一年跌下神坛！DeepSeek 从国产大模型顶流掉队，困局何解？',
+    href: 'https://discuss.deepseek.club/t/topic/1059',
     category: '行业动态与观点',
     categoryColor: 'text-orange-600',
-    replies: 7,
-    views: 512,
-    time: '2 小时前',
+    replies: 0,
+    views: 0,
+    time: '刚刚',
     hot: false,
   },
   {
-    title: '新手 7 天上手 DeepSeek：环境配置 + API 调用实战',
+    title: '新手也能学会的，手把手教你电脑部署DeepSeek，赶紧来学习吧。',
+    href: 'https://discuss.deepseek.club/t/topic/374',
     category: '新手入门(Q&A)',
     categoryColor: 'text-emerald-600',
-    replies: 23,
-    views: 1280,
-    time: '3 小时前',
+    replies: 0,
+    views: 0,
+    time: '刚刚',
     hot: false,
   },
   {
@@ -102,6 +155,11 @@ const hotTopics = [
     hot: false,
   }
 ];
+
+function buildTopicHref(topic) {
+  if (topic.href) return topic.href;
+  return `https://discuss.deepseek.club/search?q=${encodeURIComponent(topic.title)}`;
+}
 
 export default function CommunitySection() {
   const ref = useRef(null);
@@ -134,7 +192,7 @@ export default function CommunitySection() {
             </p>
           </div>
           <a
-            href="https://deepseek.club/"
+            href={DISCUSS_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-2 px-5 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all whitespace-nowrap"
@@ -153,7 +211,7 @@ export default function CommunitySection() {
           {categories.map((cat, index) => (
             <motion.a
               key={cat.label}
-              href="https://deepseek.club/"
+              href={cat.href}
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 16 }}
@@ -183,7 +241,7 @@ export default function CommunitySection() {
             {displayTopics.map((topic, i) => (
               <motion.a
                 key={topic.title}
-                href="https://deepseek.club/"
+                href={buildTopicHref(topic)}
                 target="_blank"
                 rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 16 }}

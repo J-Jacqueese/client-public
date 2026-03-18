@@ -196,7 +196,7 @@ export default function AppsPage() {
                 </li>
               </ul>
               <a
-                href="https://deepseek.club/"
+                href="https://discuss.deepseek.club/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full py-2 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-lg hover:bg-white/30 transition-all"

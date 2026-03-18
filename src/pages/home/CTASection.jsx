@@ -3,6 +3,8 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 
+const DISCUSS_URL = 'https://discuss.deepseek.club/';
+
 export default function CTASection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
@@ -41,7 +43,7 @@ export default function CTASection() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <a
-                href="https://deepseek.club/"
+                href={DISCUSS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group px-7 py-3 bg-white text-blue-600 font-semibold rounded-xl transition-all shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/15 flex items-center gap-2 text-sm"

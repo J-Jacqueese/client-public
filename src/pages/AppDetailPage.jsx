@@ -308,7 +308,7 @@ export default function AppDetailPage() {
             <div className="p-5 border-b border-slate-100 flex items-center justify-between">
               <h3 className="font-semibold text-slate-900 text-sm">用户讨论</h3>
               <a
-                href="https://deepseek.club/"
+                href="https://discuss.deepseek.club/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1 transition-colors"
@@ -326,7 +326,7 @@ export default function AppDetailPage() {
                 前往深求社区参与关于 {app.name} 的讨论，分享使用经验和建议
               </p>
               <a
-                href="https://deepseek.club/"
+                href="https://discuss.deepseek.club/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2 bg-blue-500 text-white text-sm font-medium rounded-xl hover:bg-blue-600 transition-all shadow-sm"

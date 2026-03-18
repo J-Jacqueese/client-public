@@ -416,7 +416,7 @@ export default function ModelDetailPage() {
             <div className="p-5 border-b border-slate-100 flex items-center justify-between">
               <h3 className="font-semibold text-slate-900 text-sm">相关讨论</h3>
               <a
-                href="https://deepseek.club/"
+                href="https://discuss.deepseek.club/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1 transition-colors"
@@ -432,7 +432,7 @@ export default function ModelDetailPage() {
               <h4 className="text-sm font-semibold text-slate-800 mb-2">加入社区讨论</h4>
               <p className="text-xs text-slate-500 mb-4 max-w-sm mx-auto">前往深求社区参与关于 {model.name} 的讨论</p>
               <a
-                href="https://deepseek.club/"
+                href="https://discuss.deepseek.club/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2 bg-blue-500 text-white text-sm font-medium rounded-xl hover:bg-blue-600 transition-all shadow-sm"

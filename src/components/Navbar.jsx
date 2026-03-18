@@ -3,11 +3,15 @@ import { Menu, X, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
+const DISCUSS_URL = 'https://discuss.deepseek.club/';
+const BRAND_LOGO_URL =
+  'https://discuss.deepseek.club/uploads/default/original/1X/6273b6258641ff27b15ee0a9585d524d0d774de5.png';
+
 const navLinks = [
   { label: '首页', href: '/' },
   { label: '模型库', href: '/models' },
   { label: '应用榜', href: '/apps' },
-  { label: '开源社区', href: 'https://deepseek.club/', external: true },
+  { label: '开源社区', href: DISCUSS_URL, external: true },
 ];
 
 export default function Navbar() {
@@ -36,12 +40,13 @@ export default function Navbar() {
     >
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2 group shrink-0">
-          <span className="text-slate-900 font-black tracking-[-0.02em] text-lg sm:text-xl">
-            深求社区
-          </span>
-          <span className="hidden sm:inline text-xs font-mono tracking-[0.14em] text-slate-400">
-            DEEPSEEK.CLUB
-          </span>
+          <img
+            src={BRAND_LOGO_URL}
+            alt="深求社区"
+            className="h-11 w-auto object-contain"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
@@ -81,7 +86,7 @@ export default function Navbar() {
             <Search className="w-4 h-4" />
           </button>
           <a
-            href="https://deepseek.club/"
+            href={DISCUSS_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-1.5 text-[13px] font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all"
@@ -89,7 +94,7 @@ export default function Navbar() {
             登录
           </a>
           <a
-            href="https://deepseek.club/"
+            href={DISCUSS_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-1.5 text-[13px] font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20"
@@ -141,7 +146,7 @@ export default function Navbar() {
               )}
               <div className="flex gap-2 mt-2 px-4">
                 <a
-                  href="https://deepseek.club/"
+                  href={DISCUSS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 text-center py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg"
@@ -149,7 +154,7 @@ export default function Navbar() {
                   登录
                 </a>
                 <a
-                  href="https://deepseek.club/"
+                  href={DISCUSS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 text-center py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg"

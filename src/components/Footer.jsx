@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { Github, Twitter, MessageSquare, ExternalLink } from 'lucide-react';
 
-const DEEPSEEK_CLUB_LOGO = 'https://deepseek.club/uploads/default/original/1X/6273b6258641ff27b15ee0a9585d524d0d774de5.png';
+const DISCUSS_URL = 'https://discuss.deepseek.club/';
+const DEEPSEEK_CLUB_LOGO =
+  'https://discuss.deepseek.club/uploads/default/original/1X/6273b6258641ff27b15ee0a9585d524d0d774de5.png';
 
 const footerLinks = [
   {
@@ -9,16 +11,16 @@ const footerLinks = [
     links: [
       { label: '模型库', href: '#/models' },
       { label: '应用榜', href: '#/apps' },
-      { label: '开源社区', href: 'https://deepseek.club/' },
+      { label: '开源社区', href: DISCUSS_URL },
     ],
   },
   {
     title: '社区版块',
     links: [
-      { label: '行业动态', href: 'https://deepseek.club/c/17-category/17' },
-      { label: '模型发布', href: 'https://deepseek.club/c/11-category/11' },
-      { label: '论文解读', href: 'https://deepseek.club/c/12-category/12' },
-      { label: '新手入门', href: 'https://deepseek.club/c/2-category/2' },
+      { label: '行业动态', href: 'https://discuss.deepseek.club/c/17-category/17' },
+      { label: '模型发布', href: 'https://discuss.deepseek.club/c/11-category/11' },
+      { label: '论文解读', href: 'https://discuss.deepseek.club/c/12-category/12' },
+      { label: '新手入门', href: 'https://discuss.deepseek.club/c/2-category/2' },
     ],
   },
   {
@@ -44,8 +46,14 @@ export default function Footer() {
             className="lg:col-span-2"
           >
             <div className="flex items-center gap-4 mb-4">
-              <a href="https://deepseek.club/" target="_blank" rel="noopener noreferrer" className="shrink-0">
-                <img src={DEEPSEEK_CLUB_LOGO} alt="DeepSeek.Club" className="h-11 w-auto object-contain" />
+              <a href={DISCUSS_URL} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                <img
+                  src={DEEPSEEK_CLUB_LOGO}
+                  alt="深求社区"
+                  className="h-11 w-auto object-contain"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
               </a>
             </div>
             <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-sm">
@@ -61,7 +69,7 @@ export default function Footer() {
                 <Github className="w-4 h-4" />
               </a>
               <a
-                href="https://deepseek.club/"
+                href={DISCUSS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
