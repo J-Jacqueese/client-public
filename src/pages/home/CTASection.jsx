@@ -1,13 +1,14 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function CTASection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="relative py-20" ref={ref}>
+    <section className="relative py-8 mb-12" ref={ref}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -48,14 +49,12 @@ export default function CTASection() {
                 立即加入社区
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </a>
-              <a
-                href="http://dpsk.ai/#/models"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/models"
                 className="px-7 py-3 border border-white/30 hover:border-white/50 text-white font-medium rounded-xl transition-all hover:bg-white/10 text-sm"
               >
                 浏览模型库
-              </a>
+              </Link>
             </div>
 
             <div className="mt-10 flex items-center justify-center gap-6 sm:gap-8 text-xs text-blue-100/60">

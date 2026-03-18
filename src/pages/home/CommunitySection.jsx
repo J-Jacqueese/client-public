@@ -106,9 +106,10 @@ const hotTopics = [
 export default function CommunitySection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
+  const displayTopics = hotTopics.slice(0, 6);
 
   return (
-    <section id="community" className="relative py-20 section-alt" ref={ref}>
+    <section id="community" className="relative py-8 section-alt" ref={ref}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -179,7 +180,7 @@ export default function CommunitySection() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {hotTopics.map((topic, i) => (
+            {displayTopics.map((topic, i) => (
               <motion.a
                 key={topic.title}
                 href="https://deepseek.club/"

@@ -175,9 +175,13 @@ export default function AppsPage() {
                 <h3 className="font-bold text-sm">创业者扶持计划</h3>
               </div>
               <p className="text-blue-100 text-xs leading-relaxed mb-4">
-                面向基于 DeepSeek 模型构建应用的团队，提供技术指导、社区推广等支持。
+                面向基于 DeepSeek 模型构建应用的创业团队，提供算力补贴、技术指导、社区推广等全方位支持。
               </p>
               <ul className="space-y-2 mb-4">
+                <li className="flex items-center gap-2 text-xs text-blue-100">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  最高 100 万 Token 算力补贴
+                </li>
                 <li className="flex items-center gap-2 text-xs text-blue-100">
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                   专属技术支持通道
@@ -185,6 +189,10 @@ export default function AppsPage() {
                 <li className="flex items-center gap-2 text-xs text-blue-100">
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                   社区首页推荐位
+                </li>
+                <li className="flex items-center gap-2 text-xs text-blue-100">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  投资机构对接机会
                 </li>
               </ul>
               <a
@@ -230,35 +238,6 @@ export default function AppsPage() {
                     </span>
                   </Link>
                 ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-              <h3 className="font-semibold text-slate-900 text-sm mb-4">热门分类</h3>
-              <div className="space-y-2">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => setActiveCategory(category.name)}
-                    className={`w-full flex justify-between items-center text-sm font-medium py-2 px-3 rounded-lg transition-colors ${
-                      activeCategory === category.name
-                        ? 'text-blue-600 bg-blue-50'
-                        : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span>{category.name}</span>
-                    <span className="text-slate-400 text-xs">{categoryCounts[category.name] || 0}</span>
-                  </button>
-                ))}
-                <button
-                  onClick={() => setActiveCategory('全部')}
-                  className={`w-full flex justify-between items-center text-sm font-medium py-2 px-3 rounded-lg transition-colors ${
-                    activeCategory === '全部' ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <span>全部</span>
-                  <span className="text-slate-400 text-xs">{apps.length}</span>
-                </button>
               </div>
             </div>
 

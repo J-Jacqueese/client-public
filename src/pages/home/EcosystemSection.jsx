@@ -16,7 +16,7 @@ const pillars = [
     subtitle: 'Model Library',
     desc: '汇聚 DeepSeek 全系列模型及社区微调版本，按行业细分，支持一键部署与评测对比',
     image: MODELS_IMG,
-    href: 'http://dpsk.ai/#/models',
+    href: '#/models',
     gradient: 'from-blue-500 to-indigo-500',
     textColor: 'text-blue-600',
   },
@@ -26,7 +26,7 @@ const pillars = [
     subtitle: 'App Leaderboard',
     desc: '发现并支持基于 DeepSeek 生态的创新 AI 产品，社区投票驱动的应用排行榜',
     image: APPS_IMG,
-    href: 'http://dpsk.ai/#/apps',
+    href: '#/apps',
     gradient: 'from-orange-400 to-rose-400',
     textColor: 'text-orange-600',
   },
@@ -47,7 +47,7 @@ export default function EcosystemSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="py-20" ref={ref}>
+    <section className="py-16" ref={ref}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 24 }}

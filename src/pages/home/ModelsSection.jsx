@@ -1,6 +1,7 @@
 import { ArrowRight, Boxes, Download, Star, Cpu, Brain, Eye, MessageSquare, Code2, Zap } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { modelAPI, commonAPI } from '../../services/api';
 
 export default function ModelsSection() {
@@ -98,7 +99,7 @@ export default function ModelsSection() {
   }, [models, activeCategory]);
 
   return (
-    <section id="models" className="relative py-20 section-alt" ref={ref}>
+    <section id="models" className="relative py-8 section-alt" ref={ref}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -120,15 +121,13 @@ export default function ModelsSection() {
               汇聚 DeepSeek 全系列模型及社区微调版本，覆盖 NLP、视觉、代码、数学等多个领域
             </p>
           </div>
-          <a
-            href="http://dpsk.ai/#/models"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/models"
             className="group flex items-center gap-2 px-5 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all whitespace-nowrap"
           >
             查看全部模型
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </a>
+          </Link>
         </motion.div>
 
         <motion.div
@@ -169,9 +168,7 @@ export default function ModelsSection() {
             featuredModels.map((model, index) => (
               <motion.a
                 key={model.id}
-                href="http://dpsk.ai/#/models"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={`#/models/${model.id}`}
                 initial={{ opacity: 0, y: 24 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.25 + index * 0.06, duration: 0.45 }}
@@ -232,15 +229,13 @@ export default function ModelsSection() {
           transition={{ delay: 0.8, duration: 0.5 }}
           className="text-center mt-8"
         >
-          <a
-            href="http://dpsk.ai/#/models"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/models"
             className="inline-flex items-center gap-2 text-sm text-blue-500 hover:text-blue-600 font-medium transition-colors"
           >
             查看全部模型
             <ArrowRight className="w-3.5 h-3.5" />
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

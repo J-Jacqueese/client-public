@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Boxes, Rocket, Users, GitBranch } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const HERO_BG =
   'https://d2xsxph8kpxj0f.cloudfront.net/310519663303298638/ER9yLJ9G8WWDh2VPWc45Ne/whale-hero-v2-3rMZLe3mLquuKvNJDYxs2z.webp';
@@ -46,18 +47,21 @@ export default function HeroSection() {
     <section className="relative overflow-hidden">
       <div className="relative">
         <div
-          className="relative w-full min-h-[480px] sm:min-h-[520px] md:min-h-[560px] bg-cover bg-center bg-no-repeat flex items-center justify-center"
-          style={{ backgroundImage: `url(${HERO_BG})` }}
+          className="relative w-full min-h-[520px] sm:min-h-[560px] md:min-h-[620px] bg-cover bg-center bg-no-repeat flex items-center justify-center"
+          style={{
+            backgroundImage: `url(${HERO_BG})`,
+            backgroundPosition: 'center calc(78% + 16px)',
+          }}
         >
           <div className="absolute inset-0 bg-white/55" />
           <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/30 to-white/80" />
-          <div className="relative z-10 py-14 sm:py-16 md:py-20 w-full">
+          <div className="relative z-10 py-20 md:py-24 w-full">
             <div className="container">
               <motion.div
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                className="max-w-3xl mx-auto text-center pt-4"
+                className="max-w-3xl mx-auto text-center pt-14"
               >
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -71,14 +75,16 @@ export default function HeroSection() {
                   </span>
                 </motion.div>
 
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-none mb-5 tracking-[-0.03em]">
-                  <span className="block">
-                    <span className="inline-block text-slate-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">共建 </span>
-                    <span className="inline-block text-gradient-ocean drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">DeepSeek</span>
-                  </span>
-                  <span className="block mt-1.5 sm:mt-2 text-slate-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-5 leading-[1.15] overflow-visible">
+                  <div className="flex items-baseline gap-2 justify-center overflow-visible">
+                    <span className="text-slate-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">共建 </span>
+                    <span className="text-gradient-ocean drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] inline-block pb-[0.12em] overflow-visible">
+                      DeepSeek
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 justify-center mt-4 sm:mt-5 text-slate-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
                     开源生态
-                  </span>
+                  </div>
                 </h1>
 
                 <motion.p
@@ -104,15 +110,13 @@ export default function HeroSection() {
                   transition={{ delay: 0.45, duration: 0.5 }}
                   className="flex flex-col sm:flex-row items-center justify-center gap-3"
                 >
-                  <a
-                    href="http://dpsk.ai/#/models"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/models"
                     className="group px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/35 flex items-center gap-2 text-sm"
                   >
                     探索模型库
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </a>
+                  </Link>
                   <a
                     href="https://deepseek.club/"
                     target="_blank"

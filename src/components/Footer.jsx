@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Github, Twitter, MessageSquare, ExternalLink } from 'lucide-react';
-import logo from '../../WechatIMG1177.jpg';
 
 const DEEPSEEK_CLUB_LOGO = 'https://deepseek.club/uploads/default/original/1X/6273b6258641ff27b15ee0a9585d524d0d774de5.png';
 
@@ -8,8 +7,8 @@ const footerLinks = [
   {
     title: '生态平台',
     links: [
-      { label: '模型库', href: 'http://dpsk.ai/#/models' },
-      { label: '应用榜', href: 'http://dpsk.ai/#/apps' },
+      { label: '模型库', href: '#/models' },
+      { label: '应用榜', href: '#/apps' },
       { label: '开源社区', href: 'https://deepseek.club/' },
     ],
   },
@@ -45,9 +44,6 @@ export default function Footer() {
             className="lg:col-span-2"
           >
             <div className="flex items-center gap-4 mb-4">
-              <a href="http://dpsk.ai/#/" target="_blank" rel="noopener noreferrer" className="shrink-0">
-                <img src={logo} alt="dpsk.ai" className="h-11 w-auto object-contain" />
-              </a>
               <a href="https://deepseek.club/" target="_blank" rel="noopener noreferrer" className="shrink-0">
                 <img src={DEEPSEEK_CLUB_LOGO} alt="DeepSeek.Club" className="h-11 w-auto object-contain" />
               </a>

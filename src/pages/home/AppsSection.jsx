@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { appAPI, commonAPI } from '../../services/api';
 
 function getRankStyle(rank) {
@@ -81,7 +82,20 @@ export default function AppsSection() {
   }, [apps, activeTab]);
 
   const hotApps = useMemo(
-    () => filteredApps.slice(0, 6),
+    () => {
+      const top5 = filteredApps.slice(0, 5);
+      const sixth = filteredApps[5];
+      if (!sixth) return top5;
+
+      const idx = top5.findIndex(
+        (app) => String(app?.name || '').trim().toLowerCase() === 'stepclaw',
+      );
+      if (idx === -1) return top5;
+
+      const next = [...top5];
+      next.splice(idx + 1, 0, sixth);
+      return next;
+    },
     [filteredApps],
   );
 
@@ -97,7 +111,7 @@ export default function AppsSection() {
   }, [apps]);
 
   return (
-    <section id="apps" className="relative py-20" ref={ref}>
+    <section id="apps" className="relative py-8" ref={ref}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -119,15 +133,13 @@ export default function AppsSection() {
               发现、体验并支持基于 DeepSeek 生态的创新 AI 产品，每周更新排名
             </p>
           </div>
-          <a
-            href="http://dpsk.ai/#/apps"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/apps"
             className="group flex items-center gap-2 px-5 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all whitespace-nowrap"
           >
             查看完整榜单
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </a>
+          </Link>
         </motion.div>
 
         <motion.div
@@ -225,20 +237,36 @@ export default function AppsSection() {
               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-5">
                 <div className="flex items-center gap-2 mb-2.5">
                   <Award className="w-5 h-5 text-amber-300" />
-                  <h3 className="font-bold text-white text-sm">创业者扶持</h3>
+                  <h3 className="font-bold text-white text-sm">创业生态扶持计划</h3>
                 </div>
-                <p className="text-sm text-blue-100/80 mb-4 leading-relaxed">
-                  入选本周前三名的应用，将获得官方社区置顶引流与媒体采访机会
+                <p className="text-sm text-blue-100/85 mb-4 leading-relaxed">
+                  面向基于 DeepSeek 模型构建应用的创业团队，提供算力补贴、技术指导、社区推广等全方位支持。
                 </p>
-                <a
-                  href="http://dpsk.ai/#/apps"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <ul className="space-y-2.5 mb-4">
+                  <li className="flex items-center gap-2 text-xs text-blue-100">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    最高 100 万 Token 算力补贴
+                  </li>
+                  <li className="flex items-center gap-2 text-xs text-blue-100">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    专属技术支持通道
+                  </li>
+                  <li className="flex items-center gap-2 text-xs text-blue-100">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    社区首页推荐位
+                  </li>
+                  <li className="flex items-center gap-2 text-xs text-blue-100">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    投资机构对接机会
+                  </li>
+                </ul>
+                <Link
+                  to="/apps"
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all"
                 >
                   了解更多
                   <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                </Link>
               </div>
             </div>
 

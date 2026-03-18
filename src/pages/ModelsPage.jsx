@@ -22,7 +22,7 @@ export default function ModelsPage() {
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '0');
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedBaseModels, setSelectedBaseModels] = useState([]);
-  const [sortBy, setSortBy] = useState('latest');
+  const [sortBy, setSortBy] = useState('downloads');
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);

@@ -2,7 +2,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import logo from '../../WechatIMG1177.jpg';
 
 const navLinks = [
   { label: '首页', href: '/' },
@@ -36,12 +35,13 @@ export default function Navbar() {
       }`}
     >
       <div className="container flex items-center justify-between h-16">
-        <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-          <img
-            src={logo}
-            alt="dpsk.ai"
-            className="h-10 sm:h-11 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.01]"
-          />
+        <Link to="/" className="flex items-center gap-2 group shrink-0">
+          <span className="text-slate-900 font-black tracking-[-0.02em] text-lg sm:text-xl">
+            深求社区
+          </span>
+          <span className="hidden sm:inline text-xs font-mono tracking-[0.14em] text-slate-400">
+            DEEPSEEK.CLUB
+          </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
