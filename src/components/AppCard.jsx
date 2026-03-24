@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Heart, Users, TrendingUp, Globe, Download } from 'lucide-react';
+import { Heart, Users, Globe, Download, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { appAPI } from '../services/api';
 
 export default function AppCard({ app, rank }) {
   const [hasUpvoted, setHasUpvoted] = useState(false);
@@ -17,15 +18,18 @@ export default function AppCard({ app, rank }) {
     const hasLiked = upvotedApps.includes(appId);
 
     if (hasLiked) {
-      const next = upvotedApps.filter((id) => id !== appId);
-      localStorage.setItem('upvotedApps', JSON.stringify(next));
-      setHasUpvoted(false);
       return;
     }
 
-    upvotedApps.push(appId);
-    localStorage.setItem('upvotedApps', JSON.stringify(upvotedApps));
-    setHasUpvoted(true);
+    appAPI.upvote(app.id)
+      .then(() => {
+        upvotedApps.push(appId);
+        localStorage.setItem('upvotedApps', JSON.stringify(upvotedApps));
+        setHasUpvoted(true);
+      })
+      .catch((error) => {
+        console.error('Failed to upvote app:', error);
+      });
   };
 
   const displayUpvotes = Math.max(0, (app.upvotes || 0) + (hasUpvoted ? 1 : 0));
@@ -65,6 +69,7 @@ export default function AppCard({ app, rank }) {
 
             <button
               onClick={handleToggleUpvote}
+              disabled={hasUpvoted}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
                 hasUpvoted
                   ? 'bg-rose-50 text-rose-600 border border-rose-200'
@@ -83,9 +88,13 @@ export default function AppCard({ app, rank }) {
               <Users className="w-3 h-3" />
               {(app.views || 0).toLocaleString()} 浏览
             </span>
-            <span className="flex items-center gap-1 text-emerald-500">
-              <TrendingUp className="w-3 h-3" />
-              +{Math.min(99, (app.upvotes || 0) % 50)}%
+            <span className="flex items-center gap-1">
+              <Download className="w-3 h-3" />
+              {(app.downloads || 0).toLocaleString()} 下载
+            </span>
+            <span className="flex items-center gap-1">
+              <Star className="w-3 h-3 text-amber-400" />
+              {(app.stars || 0).toLocaleString()} Stars
             </span>
             {app.website_url && (
               <a

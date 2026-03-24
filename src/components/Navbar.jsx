@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import SocialIconLinks, { DISCUSS_URL } from './SocialIconLinks';
+import { DISCUSS_URL } from './SocialIconLinks';
 
 const BRAND_LOGO_URL = 'https://discuss.deepseek.club/uploads/default/original/1X/6273b6258641ff27b15ee0a9585d524d0d774de5.png';
 
@@ -83,7 +83,6 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-2.5">
-          <SocialIconLinks />
           <a
             href={DISCUSS_URL}
             target="_blank"
@@ -143,9 +142,6 @@ export default function Navbar() {
                   </Link>
                 ),
               )}
-              <div className="px-4 mt-2">
-                <SocialIconLinks />
-              </div>
               <div className="flex gap-2 mt-3 px-4">
                 <a
                   href={DISCUSS_URL}

@@ -4,7 +4,6 @@ import {
   Heart,
   ExternalLink,
   Download,
-  TrendingUp,
   Users,
   ChevronRight,
   Globe,
@@ -44,21 +43,24 @@ export default function AppDetailPage() {
     }
   };
 
-  const handleToggleUpvote = () => {
+  const handleToggleUpvote = async () => {
     const appId = String(id);
     const upvotedApps = JSON.parse(localStorage.getItem('upvotedApps') || '[]');
     const hasLiked = upvotedApps.includes(appId);
 
     if (hasLiked) {
-      const next = upvotedApps.filter((savedId) => savedId !== appId);
-      localStorage.setItem('upvotedApps', JSON.stringify(next));
-      setHasUpvoted(false);
       return;
     }
 
-    upvotedApps.push(appId);
-    localStorage.setItem('upvotedApps', JSON.stringify(upvotedApps));
-    setHasUpvoted(true);
+    try {
+      await appAPI.upvote(id);
+      upvotedApps.push(appId);
+      localStorage.setItem('upvotedApps', JSON.stringify(upvotedApps));
+      setHasUpvoted(true);
+      setApp((prev) => ({ ...prev, upvotes: (prev?.upvotes || 0) + 1 }));
+    } catch (error) {
+      console.error('Failed to upvote app:', error);
+    }
   };
 
   const copyToClipboard = async (text) => {
@@ -100,8 +102,16 @@ export default function AppDetailPage() {
   };
 
   const displayUpvotes = Math.max(0, (app?.upvotes || 0) + (hasUpvoted ? 1 : 0));
-  const downloadLinks = Array.isArray(app?.download_links) ? app.download_links.filter((link) => link?.url) : [];
-  const primaryDownloadUrl = downloadLinks[0]?.url || app?.download_url || '';
+  const normalizedDownloadLinks = Array.isArray(app?.download_links)
+    ? app.download_links.filter((link) => link?.url)
+    : [];
+  const downloadLinks =
+    normalizedDownloadLinks.length > 0
+      ? normalizedDownloadLinks
+      : app?.website_url
+        ? [{ type: '官网链接', url: app.website_url }]
+        : [];
+  const primaryDownloadUrl = downloadLinks[0]?.url || app?.download_url || app?.website_url || '';
 
   if (loading) {
     return (
@@ -174,8 +184,9 @@ export default function AppDetailPage() {
                   <Users className="w-3.5 h-3.5 text-slate-400" />
                   {(app.views || 0).toLocaleString()} 浏览
                 </span>
-                <span className="flex items-center gap-1.5 text-emerald-600">
-                  <TrendingUp className="w-3.5 h-3.5" />+{Math.min(99, (app.upvotes || 0) % 50)}%
+                <span className="flex items-center gap-1.5">
+                  <Download className="w-3.5 h-3.5 text-slate-400" />
+                  {(app.downloads || 0).toLocaleString()} 下载
                 </span>
               </div>
 
@@ -189,6 +200,16 @@ export default function AppDetailPage() {
                   <Users className="w-4 h-4 text-slate-400" />
                   <span className="font-semibold text-slate-800">{(app.views || 0).toLocaleString()}</span>
                   <span className="text-slate-400">浏览</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-600">
+                  <Download className="w-4 h-4 text-slate-400" />
+                  <span className="font-semibold text-slate-800">{(app.downloads || 0).toLocaleString()}</span>
+                  <span className="text-slate-400">下载</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-600">
+                  <Star className="w-4 h-4 text-amber-400" />
+                  <span className="font-semibold text-slate-800">{(app.stars || 0).toLocaleString()}</span>
+                  <span className="text-slate-400">Stars</span>
                 </div>
               </div>
             </div>
@@ -217,6 +238,7 @@ export default function AppDetailPage() {
               )}
               <button
                 onClick={handleToggleUpvote}
+                disabled={hasUpvoted}
                 className={`flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl border transition-all ${
                   hasUpvoted
                     ? 'bg-rose-50 text-rose-600 border-rose-200'
@@ -224,7 +246,7 @@ export default function AppDetailPage() {
                 }`}
               >
                 <Heart className={`w-4 h-4 ${hasUpvoted ? 'fill-rose-500' : ''}`} />
-                {hasUpvoted ? '取消点赞' : '点赞支持'}
+                {hasUpvoted ? '已点赞' : '点赞支持'}
               </button>
               <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:border-blue-300 hover:text-blue-600 transition-all">
                 <Share2 className="w-4 h-4" />
@@ -247,17 +269,6 @@ export default function AppDetailPage() {
             应用详情
           </button>
           <button
-            onClick={() => setActiveTab('discuss')}
-            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeTab === 'discuss'
-                ? 'bg-blue-500 text-white shadow-sm'
-                : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            用户讨论
-          </button>
-          <button
             onClick={() => setActiveTab('download')}
             className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === 'download'
@@ -267,6 +278,17 @@ export default function AppDetailPage() {
           >
             <Download className="w-4 h-4" />
             下载应用
+          </button>
+          <button
+            onClick={() => setActiveTab('discuss')}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === 'discuss'
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            相关论坛
           </button>
         </div>
         {activeTab === 'detail' && (
@@ -306,7 +328,7 @@ export default function AppDetailPage() {
         {activeTab === 'discuss' && (
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-semibold text-slate-900 text-sm">用户讨论</h3>
+              <h3 className="font-semibold text-slate-900 text-sm">相关论坛</h3>
               <a
                 href="https://discuss.deepseek.club/"
                 target="_blank"
