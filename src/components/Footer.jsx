@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
-import { Github, Twitter, MessageSquare, ExternalLink } from 'lucide-react';
-
-const DISCUSS_URL = 'https://discuss.deepseek.club/';
+import { ExternalLink } from 'lucide-react';
+import SocialIconLinks, { DISCUSS_URL } from './SocialIconLinks';
 const DEEPSEEK_CLUB_LOGO =
   'https://discuss.deepseek.club/uploads/default/original/1X/6273b6258641ff27b15ee0a9585d524d0d774de5.png';
 
@@ -59,30 +58,7 @@ export default function Footer() {
             <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-sm">
               共建全球最大的第三方 DeepSeek 开源生态社区。科技向善，仝创未来！
             </p>
-            <div className="flex items-center gap-2.5">
-              <a
-                href="https://github.com/deepseek-ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
-              >
-                <Github className="w-4 h-4" />
-              </a>
-              <a
-                href={DISCUSS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
-              >
-                <MessageSquare className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-            </div>
+            <SocialIconLinks />
           </motion.div>
 
           {footerLinks.map((group, index) => (

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 统一使用 model_api 作为后端前缀
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/model_api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://deepseek.club/model_api/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -26,6 +26,23 @@ export const appAPI = {
   getAll: (params) => api.get('/apps', { params }),
   getById: (id) => api.get(`/apps/${id}`),
   upvote: (id) => api.post(`/apps/${id}/upvote`),
+};
+
+// 活动相关API
+export const eventAPI = {
+  getAll: (params) => api.get('/events', { params }),
+  getById: (id) => api.get(`/events/${id}`),
+  submit: (data) => api.post('/events/submit', data),
+  like: (id) => api.post(`/events/${id}/like`),
+  register: (id, data) => api.post(`/events/${id}/register`, data),
+};
+
+// 项目相关API
+export const projectAPI = {
+  getAll: (params) => api.get('/projects', { params }),
+  getById: (id) => api.get(`/projects/${id}`),
+  submit: (data) => api.post('/projects/submit', data),
+  like: (id) => api.post(`/projects/${id}/like`),
 };
 
 // 通用API

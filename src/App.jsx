@@ -8,6 +8,12 @@ import ModelsPage from './pages/ModelsPage';
 import ModelDetailPage from './pages/ModelDetailPage';
 import AppsPage from './pages/AppsPage';
 import AppDetailPage from './pages/AppDetailPage';
+import EventsPage from './pages/EventsPage';
+import EventDetailPage from './pages/EventDetailPage';
+import EventSubmitPage from './pages/EventSubmitPage';
+import ProjectsPage from './pages/ProjectsPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
+import ProjectSubmitPage from './pages/ProjectSubmitPage';
 
 function ScrollToTopOnRouteChange() {
   const { pathname } = useLocation();
@@ -32,6 +38,12 @@ function App() {
           <Route path="/models/:id" element={<ModelDetailPage />} />
           <Route path="/apps" element={<AppsPage />} />
           <Route path="/apps/:id" element={<AppDetailPage />} />
+          <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/:id" element={<EventDetailPage />} />
+          <Route path="/events/submit" element={<EventSubmitPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:id" element={<ProjectDetailPage />} />
+          <Route path="/projects/submit" element={<ProjectSubmitPage />} />
         </Routes>
         <Footer />
       </div>
