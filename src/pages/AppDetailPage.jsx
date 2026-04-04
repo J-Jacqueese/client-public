@@ -4,7 +4,6 @@ import {
   Heart,
   ExternalLink,
   Download,
-  Users,
   ChevronRight,
   Globe,
   Share2,
@@ -181,10 +180,6 @@ export default function AppDetailPage() {
                   {app.created_at ? new Date(app.created_at).toLocaleDateString('zh-CN') : '未知日期'}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-slate-400" />
-                  {(app.views || 0).toLocaleString()} 浏览
-                </span>
-                <span className="flex items-center gap-1.5">
                   <Download className="w-3.5 h-3.5 text-slate-400" />
                   {(app.downloads || 0).toLocaleString()} 下载
                 </span>
@@ -195,11 +190,6 @@ export default function AppDetailPage() {
                   <Heart className={`w-4 h-4 ${hasUpvoted ? 'text-rose-500 fill-rose-500' : 'text-slate-400'}`} />
                   <span className="font-semibold text-slate-800">{displayUpvotes.toLocaleString()}</span>
                   <span className="text-slate-400">点赞</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-slate-600">
-                  <Users className="w-4 h-4 text-slate-400" />
-                  <span className="font-semibold text-slate-800">{(app.views || 0).toLocaleString()}</span>
-                  <span className="text-slate-400">浏览</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-600">
                   <Download className="w-4 h-4 text-slate-400" />

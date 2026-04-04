@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   Calendar,
   MapPin,
@@ -7,13 +9,13 @@ import {
   Heart,
   ChevronRight,
   Share2,
-  Tag,
   CheckCircle,
   ExternalLink,
   User,
 } from 'lucide-react';
-import { eventAPI } from '../services/api';
+import { eventAPI, resolvePublicUrl } from '../services/api';
 import { showGlobalToast } from '../components/GlobalToast';
+import { getCityLabel } from '../lib/eventLabels';
 
 const EVENT_TYPES = {
   hackathon: '黑客松',
@@ -167,48 +169,95 @@ export default function EventDetailPage() {
   const modeLabel = EVENT_MODES[event.event_mode] || event.event_mode;
   const statusLabel = EVENT_STATUSES[event.event_status] || event.event_status;
 
+  const cityLabel = getCityLabel(event.city) || event.city || '';
+
   return (
     <div className="min-h-screen pt-16 pb-16 bg-gradient-to-b from-slate-50 to-white">
       <div className="container">
-        <div className="mt-4 mb-6">
+        <div className="mb-8 pt-10">
           <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-            <Link to="/">首页</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <Link to="/events">AI 活动</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-slate-700 font-medium truncate max-w-[300px]">{title}</span>
+            <Link to="/" className="hover:text-blue-600 transition-colors">
+              首页
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+            <Link to="/events" className="hover:text-blue-600 transition-colors">
+              AI 活动
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="text-slate-800 font-medium truncate max-w-[min(100%,280px)]">{title}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-            <div className="space-y-6">
-              <div className="relative rounded-2xl overflow-hidden h-[220px] bg-slate-100">
-                {event.cover_image ? (
-                  <img src={event.cover_image} alt={event.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-400">暂无封面图</div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <StatusBadge status={event.event_status} />
-                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-white/15 text-white border border-white/20">
-                      {typeLabel}
-                    </span>
-                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-white/15 text-white border border-white/20">
-                      {modeLabel}
-                    </span>
-                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-white/15 text-white border border-white/20">
-                      {event.city}
-                    </span>
-                  </div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">{event.title}</h1>
+            <div className="space-y-6 min-w-0">
+              <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-100">
+                <div className="aspect-[2/1] max-h-[280px] w-full">
+                  {event.cover_image ? (
+                    <img
+                      src={resolvePublicUrl(event.cover_image)}
+                      alt={event.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full min-h-[160px] flex items-center justify-center text-slate-400 text-sm">
+                      暂无封面图
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6">
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8">
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <StatusBadge status={event.event_status} />
+                  <span className="px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    {typeLabel}
+                  </span>
+                  <span className="px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    {modeLabel}
+                  </span>
+                  {cityLabel ? (
+                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                      {cityLabel}
+                    </span>
+                  ) : null}
+                </div>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 leading-snug mb-4">{event.title}</h1>
+                {Array.isArray(event.tags) && event.tags.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {event.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs rounded-lg border border-blue-100"
+                      >
+                        #{t}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8">
                 <h2 className="text-lg font-bold text-slate-800 mb-4">活动介绍</h2>
-                <div className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">
-                  {event.full_desc || event.desc}
+                <div className="event-detail-md text-slate-600 text-sm leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_h1]:text-xl [&_h1]:font-bold [&_h1]:text-slate-800 [&_h1]:mt-6 [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-slate-800 [&_h2]:mt-5 [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-slate-800 [&_h3]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-1 [&_a]:text-blue-600 [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-slate-200 [&_blockquote]:pl-3 [&_blockquote]:text-slate-500 [&_code]:text-rose-600 [&_code]:text-[0.9em] [&_pre]:bg-slate-50 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_table]:w-full [&_table]:text-xs [&_th]:border [&_th]:border-slate-200 [&_th]:p-2 [&_th]:bg-slate-50 [&_td]:border [&_td]:border-slate-200 [&_td]:p-2">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      img: ({ src, alt }) =>
+                        src ? (
+                          <img
+                            src={resolvePublicUrl(src)}
+                            alt={alt || ''}
+                            className="rounded-lg max-w-full h-auto my-3 border border-slate-100"
+                          />
+                        ) : null,
+                      a: ({ href, children }) => (
+                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {event.full_desc || event.desc || ''}
+                  </ReactMarkdown>
                 </div>
               </div>
 
@@ -231,22 +280,24 @@ export default function EventDetailPage() {
                   <h2 className="text-lg font-bold text-slate-800 mb-4">活动日程</h2>
                   <div className="space-y-3">
                     {event.agenda.map((item, i) => (
-                      <div key={i} className="flex gap-4">
-                        <div className="flex flex-col items-center">
-                          <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-blue-200 mt-1" />
-                          {i < event.agenda.length - 1 ? <div className="w-0.5 flex-1 bg-blue-100 mt-2" /> : null}
+                      <div key={i} className="flex gap-4 min-w-0 items-stretch">
+                        <div className="flex flex-col items-center flex-shrink-0 w-4">
+                          <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-blue-200 mt-1 flex-shrink-0" />
+                          {i < event.agenda.length - 1 ? (
+                            <div className="w-0.5 flex-1 min-h-[1rem] bg-blue-100 mt-2" />
+                          ) : null}
                         </div>
-                        <div className="pb-4">
-                          <div className="flex items-center gap-2 mb-1">
+                        <div className="pb-4 min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
                             <span className="text-xs font-mono font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
                               {item.time}
                             </span>
                           </div>
-                          <div className="font-medium text-slate-800 text-sm">{item.title}</div>
+                          <div className="font-medium text-slate-800 text-sm break-words">{item.title}</div>
                           {item.speaker ? (
-                            <div className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                              <User className="w-3 h-3" />
-                              {item.speaker}
+                            <div className="text-xs text-slate-500 mt-1 flex items-start gap-1 break-words">
+                              <User className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                              <span>{item.speaker}</span>
                             </div>
                           ) : null}
                         </div>
@@ -290,25 +341,10 @@ export default function EventDetailPage() {
                 </div>
               ) : null}
 
-              {Array.isArray(event.tags) && event.tags.length > 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-200/80 p-6">
-                  <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <Tag className="w-5 h-5 text-blue-500" />
-                    活动标签
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {event.tags.map((t) => (
-                      <span key={t} className="px-3 py-1.5 bg-slate-50 text-slate-600 text-sm rounded-lg border border-slate-200">
-                        #{t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
             </div>
 
-            <aside className="space-y-5">
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sticky top-24">
+            <aside className="space-y-5 lg:min-w-[320px]">
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sticky top-28">
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-sm text-slate-500">报名进度</div>
                   <div className="text-sm font-semibold text-slate-800">
@@ -371,57 +407,60 @@ export default function EventDetailPage() {
                   </button>
                 </div>
 
-                <div className="mt-5 pt-5 border-t border-slate-100 space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Users className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-500">主办方：</span>
-                    <span className="text-slate-800 font-medium">{event.organizer}</span>
+                <div className="mt-5 pt-5 border-t border-slate-100 space-y-3.5">
+                  {/* 标签列收窄到约「主办方：」宽度；链接行用「链接：」避免撑开整列 */}
+                  <div className="grid grid-cols-[1rem_4rem_1fr] gap-x-2 items-start text-sm leading-snug">
+                    <Users className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-500 whitespace-nowrap pt-0.5">主办方：</span>
+                    <span className="text-slate-800 font-medium min-w-0 break-words">{event.organizer}</span>
                   </div>
                   {event.online_url ? (
-                    <div className="flex items-center gap-2 text-sm">
-                      <ExternalLink className="w-4 h-4 text-slate-400" />
+                    <div className="grid grid-cols-[1rem_4rem_1fr] gap-x-2 items-start text-sm leading-snug">
+                      <ExternalLink className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-500 whitespace-nowrap pt-0.5">链接：</span>
                       <a
                         href={event.online_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline truncate"
+                        className="text-blue-600 hover:underline min-w-0 pt-0.5 font-medium"
+                        title={event.online_url}
                       >
-                        线上链接
+                        点击打开
                       </a>
                     </div>
                   ) : null}
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-500">时间：</span>
-                    <span className="text-slate-800 font-medium">{formatDate(event.start_date)} - {formatDate(event.end_date)}</span>
+                  <div className="grid grid-cols-[1rem_4rem_1fr] gap-x-2 items-start text-sm leading-snug">
+                    <Calendar className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-500 whitespace-nowrap pt-0.5">时间：</span>
+                    <span className="text-slate-800 font-medium min-w-0 break-words">
+                      {formatDate(event.start_date)} - {formatDate(event.end_date)}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-500">地点：</span>
-                    <span className="text-slate-800 font-medium truncate">{event.location || '线上'}</span>
+                  <div className="grid grid-cols-[1rem_4rem_1fr] gap-x-2 items-start text-sm leading-snug">
+                    <MapPin className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-500 whitespace-nowrap pt-0.5">地点：</span>
+                    <span className="text-slate-800 font-medium min-w-0 break-words">{event.location || '线上'}</span>
                   </div>
                 </div>
               </div>
 
-              {Array.isArray(event.tags) && event.tags.length > 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-200/80 p-6">
-                  <h3 className="font-bold text-slate-800 text-sm mb-3">快速了解</h3>
-                  <div className="space-y-2 text-sm text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-blue-500" />
-                      <span>类型：{typeLabel}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-blue-500" />
-                      <span>形式：{modeLabel}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-blue-500" />
-                      <span>状态：{statusLabel}</span>
-                    </div>
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-6">
+                <h3 className="font-bold text-slate-800 text-sm mb-3">快速了解</h3>
+                <div className="space-y-2 text-sm text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>类型：{typeLabel}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>形式：{modeLabel}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>状态：{statusLabel}</span>
                   </div>
                 </div>
-              ) : null}
+              </div>
             </aside>
           </div>
         </div>

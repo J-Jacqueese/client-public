@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ChevronRight, Rocket, Sparkles, ArrowRight, Star, X } from 'lucide-react';
 import AppCard from '../components/AppCard';
@@ -11,11 +11,17 @@ export default function AppsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('全部');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     loadApps();
     loadCategories();
   }, [sortBy]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy, activeCategory, searchTerm]);
 
   const loadApps = async () => {
     setLoading(true);
@@ -53,7 +59,10 @@ export default function AppsPage() {
     setSearchTerm(e.target.value);
   };
 
-  const categoryTabs = ['全部', ...categories.map((c) => c.name)];
+  const categoryTabs = useMemo(
+    () => [{ key: '__all__', label: '全部' }, ...categories.map((c) => ({ key: String(c.id), label: c.name }))],
+    [categories],
+  );
 
   const filteredApps = apps.filter((app) => {
     if (activeCategory !== '全部' && (app.category_name || '其他') !== activeCategory) return false;
@@ -69,6 +78,16 @@ export default function AppsPage() {
   const newApps = [...apps]
     .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     .slice(0, 4);
+
+  const totalPages = Math.max(1, Math.ceil(filteredApps.length / PAGE_SIZE));
+  const paginatedFilteredApps = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredApps.slice(start, start + PAGE_SIZE);
+  }, [filteredApps, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage((p) => Math.min(p, totalPages));
+  }, [totalPages]);
 
   return (
     <div className="pt-16">
@@ -111,17 +130,17 @@ export default function AppsPage() {
             </div>
 
             <div className="flex flex-wrap gap-2 mb-6">
-              {categoryTabs.map((cat) => (
+              {categoryTabs.map((tab) => (
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                  key={tab.key}
+                  onClick={() => setActiveCategory(tab.label)}
                   className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                    activeCategory === cat
+                    activeCategory === tab.label
                       ? 'bg-blue-500 text-white shadow-sm'
                       : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-200 hover:text-blue-600'
                   }`}
                 >
-                  {cat}
+                  {tab.label}
                 </button>
               ))}
             </div>
@@ -151,6 +170,11 @@ export default function AppsPage() {
 
             <div className="text-sm text-slate-500 mb-4">
               共 <span className="font-semibold text-slate-800">{filteredApps.length}</span> 个应用
+              {filteredApps.length > 0 && (
+                <span className="text-slate-400 ml-2">
+                  （第 {currentPage}/{totalPages} 页，每页 {PAGE_SIZE} 个）
+                </span>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -163,9 +187,35 @@ export default function AppsPage() {
                   <div className="text-slate-400">暂无应用数据</div>
                 </div>
               ) : (
-                filteredApps.map((app, index) => <AppCard key={app.id} app={app} rank={index + 1} />)
+                paginatedFilteredApps.map((app, index) => (
+                  <AppCard key={app.id} app={app} rank={(currentPage - 1) * PAGE_SIZE + index + 1} />
+                ))
               )}
             </div>
+
+            {!loading && totalPages > 1 && (
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+                <button
+                  type="button"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                >
+                  上一页
+                </button>
+                <span className="text-sm text-slate-500 px-2">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                >
+                  下一页
+                </button>
+              </div>
+            )}
           </main>
 
           <aside className="hidden lg:block w-72 shrink-0 space-y-5">
@@ -180,7 +230,7 @@ export default function AppsPage() {
               <ul className="space-y-2 mb-4">
                 <li className="flex items-center gap-2 text-xs text-blue-100">
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  最高 100 万 Token 算力补贴
+                  最高 10,000 万（1 亿）Token 算力补贴
                 </li>
                 <li className="flex items-center gap-2 text-xs text-blue-100">
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />

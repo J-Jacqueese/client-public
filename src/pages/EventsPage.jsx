@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar,
@@ -19,7 +19,7 @@ import {
   Building,
   X,
 } from 'lucide-react';
-import { eventAPI } from '../services/api';
+import { eventAPI, resolvePublicUrl } from '../services/api';
 import { showGlobalToast } from '../components/GlobalToast';
 import EventCalendar from '../components/EventCalendar';
 import {
@@ -65,77 +65,6 @@ function getModeIcon(mode) {
   return <Globe className="w-3.5 h-3.5" />;
 }
 
-/* ─── Featured Event Banner（对齐 deepseek-club） ─── */
-function FeaturedBanner({ event }) {
-  if (!event) return null;
-  const highlights = Array.isArray(event.highlights) ? event.highlights : [];
-
-  return (
-    <Link to={`/events/${event.id}`} className="block">
-      <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
-        <div className="absolute inset-0">
-          {event.cover_image ? (
-            <img
-              src={event.cover_image}
-              alt={event.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 min-h-[320px]"
-            />
-          ) : (
-            <div className="w-full min-h-[320px] bg-gradient-to-br from-slate-800 to-slate-600" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/85 via-slate-900/60 to-transparent" />
-        </div>
-        <div className="relative p-8 md:p-12 min-h-[320px] flex flex-col justify-end">
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span
-              className={`px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(event.event_status)}`}
-            >
-              {getStatusLabel(event.event_status)}
-            </span>
-            <span className="px-3 py-1 text-xs font-medium rounded-full bg-white/15 text-white border border-white/20 backdrop-blur-sm">
-              {getTypeIcon(event.event_type)} {getTypeLabel(event.event_type)}
-            </span>
-            <span className="px-3 py-1 text-xs font-medium rounded-full bg-white/15 text-white border border-white/20 backdrop-blur-sm flex items-center gap-1">
-              {getModeIcon(event.event_mode)}
-              {getModeLabel(event.event_mode)}
-            </span>
-          </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">{event.title}</h2>
-          <p className="text-white/80 text-sm md:text-base mb-4 max-w-2xl leading-relaxed line-clamp-3">
-            {event.desc}
-          </p>
-          <div className="flex flex-wrap items-center gap-4 text-white/70 text-sm">
-            <span className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4" />
-              {formatDateRange(event.start_date, event.end_date)}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-4 h-4" />
-              {event.location || (event.city === 'online' ? '线上' : getCityLabel(event.city))}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Users className="w-4 h-4" />
-              {event.current_participants ?? 0}/{event.max_participants ?? '∞'} 人
-            </span>
-          </div>
-          {highlights.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-3 mt-6">
-              {highlights.slice(0, 4).map((h) => (
-                <span
-                  key={h}
-                  className="px-3 py-1 text-xs font-medium rounded-full bg-blue-500/20 text-blue-200 border border-blue-400/30"
-                >
-                  {h}
-                </span>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      </div>
-    </Link>
-  );
-}
-
 function EventCard({ event, onLiked }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(event.likes || 0);
@@ -173,7 +102,7 @@ function EventCard({ event, onLiked }) {
           <div className="relative h-44 overflow-hidden bg-slate-100">
             {event.cover_image ? (
               <img
-                src={event.cover_image}
+                src={resolvePublicUrl(event.cover_image)}
                 alt={event.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -209,10 +138,18 @@ function EventCard({ event, onLiked }) {
           </div>
 
           <div className="p-5 flex flex-col flex-1">
-            <h3 className="font-bold text-slate-800 text-base leading-snug mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+            <h3
+              className="font-bold text-slate-800 text-base leading-snug mb-2 group-hover:text-blue-600 transition-colors line-clamp-2 overflow-hidden break-words min-h-[2.75rem]"
+              title={event.title}
+            >
               {event.title}
             </h3>
-            <p className="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-2 flex-1">{event.desc}</p>
+            <p
+              className="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-2 overflow-hidden break-words min-h-[2.875rem]"
+              title={event.desc?.trim() ? event.desc : undefined}
+            >
+              {event.desc?.trim() ? event.desc : '\u00a0'}
+            </p>
 
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-1.5 text-slate-500 text-xs">
@@ -270,7 +207,7 @@ function UpcomingSidebar({ events }) {
               <div className="group flex gap-3 p-2 rounded-lg hover:bg-blue-50/50 transition-colors cursor-pointer">
                 <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100">
                   {ev.cover_image ? (
-                    <img src={ev.cover_image} alt={ev.title} className="w-full h-full object-cover" />
+                    <img src={resolvePublicUrl(ev.cover_image)} alt={ev.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400">
                       <Calendar className="w-4 h-4" />
@@ -376,13 +313,6 @@ export default function EventsPage() {
     load();
   }, [search, type, mode, status, city]);
 
-  const featuredEvent = useMemo(() => {
-    const found = events.find(
-      (e) => (e.event_type === 'hackathon' || e.event_type === 'conference') && e.event_status === 'registering'
-    );
-    return found || events[0] || null;
-  }, [events]);
-
   const hasActiveFilters =
     type !== 'all' || mode !== 'all' || status !== 'all' || city !== 'all' || Boolean(search.trim());
 
@@ -452,13 +382,6 @@ export default function EventsPage() {
             </div>
           </div>
         </div>
-
-        {/* Featured Banner — 仅列表模式 */}
-        {viewMode === 'list' && !loading && featuredEvent ? (
-          <div className="mb-8">
-            <FeaturedBanner event={featuredEvent} />
-          </div>
-        ) : null}
 
         {/* Filter Bar — 对齐 deepseek-club EventsListPage：无横向滚动，lg 起横向排布 */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-4 mb-6">

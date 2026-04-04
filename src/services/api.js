@@ -1,12 +1,23 @@
 import axios from 'axios';
 
 // 统一使用 model_api 作为后端前缀
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://deepseek.club/model_api/';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/model_api/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
 });
+
+/** 将接口返回的相对路径（如 /model_api/uploads/...）补全为可访问的绝对地址 */
+export function resolvePublicUrl(pathOrUrl) {
+  if (!pathOrUrl) return '';
+  const s = String(pathOrUrl).trim();
+  if (!s) return '';
+  if (/^https?:\/\//i.test(s)) return s;
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:3000/model_api/';
+  const origin = base.replace(/\/model_api\/?$/i, '').replace(/\/$/, '') || '';
+  return s.startsWith('/') ? `${origin}${s}` : `${origin}/${s}`;
+}
 
 // 模型相关API
 export const modelAPI = {

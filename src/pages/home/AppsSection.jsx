@@ -148,17 +148,18 @@ export default function AppsSection() {
           transition={{ delay: 0.15, duration: 0.5 }}
           className="flex flex-wrap gap-2 mb-8"
         >
-          {['全部', ...categories.map((c) => c.name)].map((cat) => (
+          {[{ key: '__all__', label: '全部' }, ...categories.map((c) => ({ key: String(c.id), label: c.name }))].map(
+            (tab) => (
             <button
-              key={cat}
-              onClick={() => setActiveTab(cat)}
+              key={tab.key}
+              onClick={() => setActiveTab(tab.label)}
               className={`px-3.5 py-1.5 rounded-lg text-sm transition-all ${
-                activeTab === cat
+                activeTab === tab.label
                   ? 'bg-blue-50 text-blue-700 border border-blue-200'
                   : 'text-slate-600 hover:text-blue-600 border border-transparent hover:border-slate-200 hover:bg-slate-50'
               }`}
             >
-              {cat}
+              {tab.label}
             </button>
           ))}
         </motion.div>
@@ -245,7 +246,7 @@ export default function AppsSection() {
                 <ul className="space-y-2.5 mb-4">
                   <li className="flex items-center gap-2 text-xs text-blue-100">
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    最高 100 万 Token 算力补贴
+                    最高 10,000 万（1 亿）Token 算力补贴
                   </li>
                   <li className="flex items-center gap-2 text-xs text-blue-100">
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />

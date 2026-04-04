@@ -27,10 +27,12 @@ export default function ModelsPage() {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
-    tags: true,
-    bases: true,
     industries: true,
+    bases: true,
+    tags: true,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     loadCategories();
@@ -41,6 +43,15 @@ export default function ModelsPage() {
   useEffect(() => {
     loadModels();
   }, [selectedCategory, selectedTags, selectedBaseModels, sortBy, searchParams]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedTags, selectedBaseModels, sortBy, searchParams]);
+
+  useEffect(() => {
+    const tp = Math.max(1, Math.ceil(models.length / PAGE_SIZE));
+    setCurrentPage((p) => Math.min(p, tp));
+  }, [models.length]);
 
   const loadCategories = async () => {
     try {
@@ -195,6 +206,12 @@ export default function ModelsPage() {
 
   const activeFilterCount = selectedTags.length + selectedBaseModels.length + (selectedCategory !== '0' ? 1 : 0);
 
+  const totalPages = Math.max(1, Math.ceil(models.length / PAGE_SIZE));
+  const paginatedModels = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return models.slice(start, start + PAGE_SIZE);
+  }, [models, currentPage]);
+
   const selectedCategoryName = useMemo(() => {
     if (selectedCategory === '0') return '';
     const target = categories.find((c) => String(c.id) === String(selectedCategory));
@@ -246,22 +263,22 @@ export default function ModelsPage() {
       </div>
 
       <FilterSection
-        title="主要标签"
-        expanded={expandedSections.tags}
-        onToggle={() => setExpandedSections((s) => ({ ...s, tags: !s.tags }))}
+        title="应用行业"
+        expanded={expandedSections.industries}
+        onToggle={() => setExpandedSections((s) => ({ ...s, industries: !s.industries }))}
       >
         <div className="flex flex-wrap gap-1.5">
-          {tags?.map?.((tag) => (
+          {industryOptions.map((item) => (
             <button
-              key={tag.id}
-              onClick={() => handleTagToggle(tag.name)}
+              key={item.id}
+              onClick={() => handleCategoryChange(item.id)}
               className={`px-2.5 py-1 rounded-md text-xs transition-all ${
-                selectedTags.includes(tag.name)
+                selectedCategory === item.id
                   ? 'bg-blue-500 text-white shadow-sm'
                   : 'bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 border border-slate-100'
               }`}
             >
-              {tag.name}
+              {item.name}
             </button>
           ))}
         </div>
@@ -290,22 +307,22 @@ export default function ModelsPage() {
       </FilterSection>
 
       <FilterSection
-        title="应用行业"
-        expanded={expandedSections.industries}
-        onToggle={() => setExpandedSections((s) => ({ ...s, industries: !s.industries }))}
+        title="主要标签"
+        expanded={expandedSections.tags}
+        onToggle={() => setExpandedSections((s) => ({ ...s, tags: !s.tags }))}
       >
         <div className="flex flex-wrap gap-1.5">
-          {industryOptions.map((item) => (
+          {tags?.map?.((tag) => (
             <button
-              key={item.id}
-              onClick={() => handleCategoryChange(item.id)}
+              key={tag.id}
+              onClick={() => handleTagToggle(tag.name)}
               className={`px-2.5 py-1 rounded-md text-xs transition-all ${
-                selectedCategory === item.id
+                selectedTags.includes(tag.name)
                   ? 'bg-blue-500 text-white shadow-sm'
                   : 'bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 border border-slate-100'
               }`}
             >
-              {item.name}
+              {tag.name}
             </button>
           ))}
         </div>
@@ -434,6 +451,11 @@ export default function ModelsPage() {
 
             <div className="text-sm text-slate-500 mb-4">
               共找到 <span className="font-semibold text-slate-800">{models.length}</span> 个模型
+              {models.length > 0 && (
+                <span className="text-slate-400 ml-2">
+                  （第 {currentPage}/{totalPages} 页，每页 {PAGE_SIZE} 个）
+                </span>
+              )}
             </div>
 
             {loading ? (
@@ -445,11 +467,36 @@ export default function ModelsPage() {
                 <div className="text-slate-400">暂无模型数据</div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {models?.map?.((model) => (
-                  <ModelCard key={model.id} model={model} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {paginatedModels.map((model) => (
+                    <ModelCard key={model.id} model={model} />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+                    <button
+                      type="button"
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                    >
+                      上一页
+                    </button>
+                    <span className="text-sm text-slate-500 px-2">
+                      {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                    >
+                      下一页
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </main>
         </div>

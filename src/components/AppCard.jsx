@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, Users, Globe, Download, Star } from 'lucide-react';
+import { Heart, Globe, Download, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { appAPI } from '../services/api';
 
@@ -84,10 +84,6 @@ export default function AppCard({ app, rank }) {
           <p className="text-sm text-slate-600 mb-3 line-clamp-1">{app.description || '暂无描述'}</p>
 
           <div className="flex items-center gap-4 text-xs text-slate-400">
-            <span className="flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              {(app.views || 0).toLocaleString()} 浏览
-            </span>
             <span className="flex items-center gap-1">
               <Download className="w-3 h-3" />
               {(app.downloads || 0).toLocaleString()} 下载

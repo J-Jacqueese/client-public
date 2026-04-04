@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Calendar, MapPin } from 'lucide-react';
 import { getStatusColor, getStatusLabel, getTypeLabel, getModeLabel, getTypeIcon } from '../lib/eventLabels';
+import { resolvePublicUrl } from '../services/api';
 
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
@@ -231,7 +232,7 @@ export default function EventCalendar({ events = [] }) {
                 <div className="group flex gap-4 p-3 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer">
                   <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100">
                     {ev.cover_image ? (
-                      <img src={ev.cover_image} alt={ev.title} className="w-full h-full object-cover" />
+                      <img src={resolvePublicUrl(ev.cover_image)} alt={ev.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">无图</div>
                     )}
