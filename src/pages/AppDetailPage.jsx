@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   Heart,
   ExternalLink,
@@ -12,7 +14,7 @@ import {
   Rocket,
   MessageSquare,
 } from 'lucide-react';
-import { appAPI } from '../services/api';
+import { appAPI, resolvePublicUrl } from '../services/api';
 import { showGlobalToast } from '../components/GlobalToast';
 
 export default function AppDetailPage() {
@@ -283,8 +285,27 @@ export default function AppDetailPage() {
         </div>
         {activeTab === 'detail' && (
           <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 shadow-sm">
-            <div className="prose prose-slate prose-sm max-w-none">
-              <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{app.detail || app.description}</p>
+            <div className="markdown-body">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  img: ({ src, alt }) =>
+                    src ? (
+                      <img
+                        src={resolvePublicUrl(src)}
+                        alt={alt || ''}
+                        className="rounded-lg max-w-full h-auto my-3 border border-slate-100"
+                      />
+                    ) : null,
+                  a: ({ href, children }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-700">
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
+                {app.detail || app.description}
+              </ReactMarkdown>
               {app.comparison && (
                 <div className="mt-6 p-4 rounded-xl border border-blue-100 bg-blue-50 text-sm text-blue-900">
                   {app.comparison}

@@ -237,7 +237,7 @@ export default function EventDetailPage() {
 
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8">
                 <h2 className="text-lg font-bold text-slate-800 mb-4">活动介绍</h2>
-                <div className="event-detail-md text-slate-600 text-sm leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_h1]:text-xl [&_h1]:font-bold [&_h1]:text-slate-800 [&_h1]:mt-6 [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-slate-800 [&_h2]:mt-5 [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-slate-800 [&_h3]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-1 [&_a]:text-blue-600 [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-slate-200 [&_blockquote]:pl-3 [&_blockquote]:text-slate-500 [&_code]:text-rose-600 [&_code]:text-[0.9em] [&_pre]:bg-slate-50 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_table]:w-full [&_table]:text-xs [&_th]:border [&_th]:border-slate-200 [&_th]:p-2 [&_th]:bg-slate-50 [&_td]:border [&_td]:border-slate-200 [&_td]:p-2">
+                <div className="markdown-body">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
@@ -250,7 +250,7 @@ export default function EventDetailPage() {
                           />
                         ) : null,
                       a: ({ href, children }) => (
-                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-700">
                           {children}
                         </a>
                       ),

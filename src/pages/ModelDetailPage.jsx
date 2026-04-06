@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   Download,
   Star,
@@ -17,7 +19,7 @@ import {
   Share2,
   BookOpen,
 } from 'lucide-react';
-import { modelAPI } from '../services/api';
+import { modelAPI, resolvePublicUrl } from '../services/api';
 
 const MODEL_TYPE_META = {
   hot: {
@@ -318,8 +320,27 @@ export default function ModelDetailPage() {
 
         {activeTab === 'detail' && (
           <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 shadow-sm">
-            <div className="prose prose-slate prose-sm max-w-none">
-              <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{model.readme || model.description || '暂无详细介绍'}</p>
+            <div className="markdown-body">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  img: ({ src, alt }) =>
+                    src ? (
+                      <img
+                        src={resolvePublicUrl(src)}
+                        alt={alt || ''}
+                        className="rounded-lg max-w-full h-auto my-3 border border-slate-100"
+                      />
+                    ) : null,
+                  a: ({ href, children }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-700">
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
+                {model.readme || model.description || '暂无详细介绍'}
+              </ReactMarkdown>
               {model.prompt_example && (
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold text-slate-900 mb-3">推荐 Prompt</h3>

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   ChevronRight,
   Star,
@@ -13,7 +15,7 @@ import {
   Heart,
   Share2,
 } from 'lucide-react';
-import { projectAPI } from '../services/api';
+import { projectAPI, resolvePublicUrl } from '../services/api';
 import { showGlobalToast } from '../components/GlobalToast';
 
 const PROJECT_CATEGORIES = [
@@ -267,8 +269,27 @@ export default function ProjectDetailPage() {
                 <BookOpen className="w-5 h-5 text-blue-500" />
                 项目详情
               </h2>
-              <div className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">
-                {project.long_description || project.description}
+              <div className="markdown-body">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    img: ({ src, alt }) =>
+                      src ? (
+                        <img
+                          src={resolvePublicUrl(src)}
+                          alt={alt || ''}
+                          className="rounded-lg max-w-full h-auto my-3 border border-slate-100"
+                        />
+                      ) : null,
+                    a: ({ href, children }) => (
+                      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-700">
+                        {children}
+                      </a>
+                    ),
+                  }}
+                >
+                  {project.long_description || project.description}
+                </ReactMarkdown>
               </div>
             </div>
 
