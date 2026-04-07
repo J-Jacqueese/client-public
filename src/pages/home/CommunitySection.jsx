@@ -15,7 +15,8 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import { hotTopicAPI } from '../../services/api';
 
 const DISCUSS_URL = 'https://discuss.deepseek.club/';
 
@@ -78,84 +79,6 @@ const categories = [
   },
 ];
 
-const hotTopics = [
-  {
-    title: 'DeepSeek V4 与姚顺雨混元新模型同台发布',
-    category: '行业动态与观点',
-    categoryColor: 'text-orange-600',
-    replies: 5,
-    views: 85,
-    time: '41 分钟前',
-    hot: true,
-  },
-  {
-    title: 'OpenClaw 省钱神器！MemOS 插件让 token 消耗暴跌 72%',
-    category: 'OpenClaw专区',
-    categoryColor: 'text-rose-600',
-    replies: 9,
-    views: 665,
-    time: '4 分钟前',
-    hot: true,
-  },
-  {
-    title: '手把手教你调用 DeepSeek-OCR：轻量高精度实战',
-    category: '大模型微调',
-    categoryColor: 'text-sky-600',
-    replies: 10,
-    views: 460,
-    time: '42 分钟前',
-    hot: false,
-  },
-  {
-    title: '融资 8000 万美元!Video Rebirth 领跑 AI视频，Bach 模型剑指工业级基础设施',
-    href: 'https://discuss.deepseek.club/t/topic/1094',
-    category: 'AI应用案例',
-    categoryColor: 'text-amber-600',
-    replies: 0,
-    views: 0,
-    time: '刚刚',
-    hot: true,
-  },
-  {
-    title: '一年跌下神坛！DeepSeek 从国产大模型顶流掉队，困局何解？',
-    href: 'https://discuss.deepseek.club/t/topic/1059',
-    category: '行业动态与观点',
-    categoryColor: 'text-orange-600',
-    replies: 0,
-    views: 0,
-    time: '刚刚',
-    hot: false,
-  },
-  {
-    title: '新手也能学会的，手把手教你电脑部署DeepSeek，赶紧来学习吧。',
-    href: 'https://discuss.deepseek.club/t/topic/374',
-    category: '新手入门(Q&A)',
-    categoryColor: 'text-emerald-600',
-    replies: 0,
-    views: 0,
-    time: '刚刚',
-    hot: false,
-  },
-  {
-    title: '从 Kaggle 到生产：实战部署 DeepSeek 模型全流程',
-    category: 'AI应用案例',
-    categoryColor: 'text-amber-600',
-    replies: 18,
-    views: 1540,
-    time: '5 小时前',
-    hot: true,
-  },
-  {
-    title: '大厂工程师分享：如何在企业内部安全落地大模型',
-    category: '行业动态与观点',
-    categoryColor: 'text-orange-600',
-    replies: 11,
-    views: 980,
-    time: '6 小时前',
-    hot: false,
-  }
-];
-
 function buildTopicHref(topic) {
   if (topic.href) return topic.href;
   return `https://discuss.deepseek.club/search?q=${encodeURIComponent(topic.title)}`;
@@ -164,6 +87,37 @@ function buildTopicHref(topic) {
 export default function CommunitySection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
+  const [hotTopics, setHotTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTopics = async () => {
+      try {
+        const resp = await hotTopicAPI.getAll({ limit: 6 });
+        const topics = (resp.data.data || []).map(t => ({
+          title: t.title,
+          href: t.href,
+          category: t.category,
+          categoryColor: t.categoryColor || 'text-slate-600',
+          replies: t.replies || 0,
+          views: t.views || 0,
+          time: t.time || '刚刚',
+          hot: t.hot || false,
+        }));
+        setHotTopics(topics);
+      } catch (err) {
+        console.error('Failed to load hot topics:', err);
+        // 失败时使用默认数据
+        setHotTopics([
+          { title: '加入深求社区，探索更多 AI 话题', category: '社区动态', categoryColor: 'text-blue-600', replies: 0, views: 0, time: '刚刚', hot: false },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTopics();
+  }, []);
+
   const displayTopics = hotTopics.slice(0, 6);
 
   return (

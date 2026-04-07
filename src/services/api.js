@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 统一使用 model_api 作为后端前缀
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/model_api/';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://deepseek.club/model_api/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -14,7 +14,7 @@ export function resolvePublicUrl(pathOrUrl) {
   const s = String(pathOrUrl).trim();
   if (!s) return '';
   if (/^https?:\/\//i.test(s)) return s;
-  const base = import.meta.env.VITE_API_URL || 'http://localhost:3000/model_api/';
+  const base = import.meta.env.VITE_API_URL || 'https://deepseek.club/model_api/';
   const origin = base.replace(/\/model_api\/?$/i, '').replace(/\/$/, '') || '';
   return s.startsWith('/') ? `${origin}${s}` : `${origin}/${s}`;
 }
@@ -61,6 +61,11 @@ export const commonAPI = {
   getCategories: (type) => api.get('/categories', { params: { type } }),
   getTags: () => api.get('/tags'),
   getStats: () => api.get('/stats'),
+};
+
+// 热门话题API
+export const hotTopicAPI = {
+  getAll: (params) => api.get('/hot-topics', { params }),
 };
 
 export default api;

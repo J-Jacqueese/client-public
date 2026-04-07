@@ -26,7 +26,7 @@ export default defineConfig({
     proxy: {
       // 开发环境代理到后端的 /model_api 前缀
       '/model_api': {
-        target: 'http://localhost:3000/model_api/',
+        target: 'https://deepseek.club/model_api/',
         changeOrigin: true
       }
     }

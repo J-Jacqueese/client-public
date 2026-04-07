@@ -82,20 +82,7 @@ export default function AppsSection() {
   }, [apps, activeTab]);
 
   const hotApps = useMemo(
-    () => {
-      const top5 = filteredApps.slice(0, 5);
-      const sixth = filteredApps[5];
-      if (!sixth) return top5;
-
-      const idx = top5.findIndex(
-        (app) => String(app?.name || '').trim().toLowerCase() === 'stepclaw',
-      );
-      if (idx === -1) return top5;
-
-      const next = [...top5];
-      next.splice(idx + 1, 0, sixth);
-      return next;
-    },
+    () => filteredApps.slice(0, 6),
     [filteredApps],
   );
 
@@ -127,10 +114,10 @@ export default function AppsSection() {
               <span className="font-mono text-xs text-orange-500/60 tracking-widest uppercase">App Leaderboard</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-              AI <span className="text-gradient-ocean">应用航海榜</span>
+              AI <span className="text-gradient-ocean">应用排行榜</span>
             </h2>
             <p className="text-slate-600 max-w-lg text-sm">
-              发现、体验并支持基于 DeepSeek 生态的创新 AI 产品，每周更新排名
+              发现、体验并支持创新 AI 产品，每周更新排名
             </p>
           </div>
           <Link
