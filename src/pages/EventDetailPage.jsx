@@ -444,23 +444,6 @@ export default function EventDetailPage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6">
-                <h3 className="font-bold text-slate-800 text-sm mb-3">快速了解</h3>
-                <div className="space-y-2 text-sm text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <span>类型：{typeLabel}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <span>形式：{modeLabel}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <span>状态：{statusLabel}</span>
-                  </div>
-                </div>
-              </div>
             </aside>
           </div>
         </div>

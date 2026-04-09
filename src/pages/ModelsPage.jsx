@@ -219,7 +219,7 @@ export default function ModelsPage() {
   }, [categories, selectedCategory]);
 
   const industryOptions = useMemo(
-    () => [{ id: '0', name: '全部行业' }, ...categories.map((c) => ({ id: String(c.id), name: c.name }))],
+    () => [{ id: '0', name: '全部' }, ...categories.map((c) => ({ id: String(c.id), name: c.name }))],
     [categories],
   );
 
@@ -263,7 +263,7 @@ export default function ModelsPage() {
       </div>
 
       <FilterSection
-        title="应用行业"
+        title="应用场景"
         expanded={expandedSections.industries}
         onToggle={() => setExpandedSections((s) => ({ ...s, industries: !s.industries }))}
       >

@@ -240,7 +240,13 @@ export default function AppDetailPage() {
                 <Heart className={`w-4 h-4 ${hasUpvoted ? 'fill-rose-500' : ''}`} />
                 {hasUpvoted ? '已点赞' : '点赞支持'}
               </button>
-              <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:border-blue-300 hover:text-blue-600 transition-all">
+              <button 
+                onClick={() => {
+                  navigator.clipboard?.writeText?.(window.location.href);
+                  showGlobalToast('链接已复制');
+                }}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:border-blue-300 hover:text-blue-600 transition-all"
+              >
                 <Share2 className="w-4 h-4" />
                 分享
               </button>
