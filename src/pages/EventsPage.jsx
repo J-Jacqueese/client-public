@@ -288,6 +288,12 @@ export default function EventsPage() {
   const [city, setCity] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState('list');
+  
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     const load = async () => {
@@ -300,9 +306,16 @@ export default function EventsPage() {
           status: status !== 'all' ? status : undefined,
           city: city !== 'all' ? city : undefined,
           sort: 'start_asc',
+          page: currentPage,
+          pageSize: PAGE_SIZE,
         };
         const resp = await eventAPI.getAll(params);
         setEvents(resp.data.data || []);
+        const pagination = resp?.data?.pagination;
+        if (pagination) {
+          setTotalItems(pagination.total);
+          setTotalPages(pagination.totalPages);
+        }
       } catch (err) {
         console.error(err);
         showGlobalToast('加载活动失败', 'error');
@@ -311,6 +324,12 @@ export default function EventsPage() {
       }
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, type, mode, status, city, currentPage]);
+  
+  // 当筛选条件改变时重置页码
+  useEffect(() => {
+    setCurrentPage(1);
   }, [search, type, mode, status, city]);
 
   const hasActiveFilters =
@@ -538,7 +557,7 @@ export default function EventsPage() {
             <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 flex-wrap">
               <span className="text-xs text-slate-500">当前筛选：</span>
               <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                {loading ? '…' : `${events.length} 个活动`}
+                {loading ? '…' : `${totalItems} 个活动`}
               </span>
               <button
                 type="button"
@@ -559,11 +578,37 @@ export default function EventsPage() {
               <div className="bg-white rounded-xl border border-slate-200/80 p-12 text-center text-slate-400">加载中...</div>
             ) : viewMode === 'list' ? (
               events.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {events.map((ev) => (
-                    <EventCard key={ev.id} event={ev} />
-                  ))}
-                </div>
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {events.map((ev) => (
+                      <EventCard key={ev.id} event={ev} />
+                    ))}
+                  </div>
+                  {/* 分页 */}
+                  {totalPages > 1 && (
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+                      <button
+                        type="button"
+                        disabled={currentPage <= 1}
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                      >
+                        上一页
+                      </button>
+                      <span className="text-sm text-slate-500 px-2">
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={currentPage >= totalPages}
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                      >
+                        下一页
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="bg-white rounded-xl border border-slate-200/80 p-12 text-center">
                   <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">

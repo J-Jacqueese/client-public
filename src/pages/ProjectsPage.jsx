@@ -141,6 +141,12 @@ export default function ProjectsPage() {
   const [category, setCategory] = useState('all');
   const [language, setLanguage] = useState('all');
   const [sort, setSort] = useState('stars');
+  
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const PAGE_SIZE = 20;
 
   const languages = useMemo(() => ['all', 'Python', 'TypeScript', 'Go', 'Rust', 'C++'], []);
 
@@ -153,9 +159,16 @@ export default function ProjectsPage() {
           category: category !== 'all' ? category : undefined,
           language: language !== 'all' ? language : undefined,
           sort,
+          page: currentPage,
+          pageSize: PAGE_SIZE,
         };
         const resp = await projectAPI.getAll(params);
         setProjects(resp.data.data || []);
+        const pagination = resp?.data?.pagination;
+        if (pagination) {
+          setTotalItems(pagination.total);
+          setTotalPages(pagination.totalPages);
+        }
       } catch (err) {
         console.error(err);
         showGlobalToast('加载项目失败', 'error');
@@ -164,6 +177,12 @@ export default function ProjectsPage() {
       }
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, category, language, sort, currentPage]);
+  
+  // 当筛选条件改变时重置页码
+  useEffect(() => {
+    setCurrentPage(1);
   }, [search, category, language, sort]);
 
   return (
@@ -288,7 +307,12 @@ export default function ProjectsPage() {
 
           <main>
             <div className="text-sm text-slate-500 mb-4">
-              共 <span className="font-semibold text-slate-800">{projects.length}</span> 个项目
+              共 <span className="font-semibold text-slate-800">{totalItems}</span> 个项目
+              {totalItems > 0 && (
+                <span className="text-slate-400 ml-2">
+                  （第 {currentPage}/{totalPages} 页，每页 {PAGE_SIZE} 个）
+                </span>
+              )}
             </div>
 
             {loading ? (
@@ -299,11 +323,37 @@ export default function ProjectsPage() {
                 <div className="text-sm text-slate-400">试试其他关键词或分类</div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {projects.map((p) => (
-                  <ProjectCard key={p.id} project={p} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {projects.map((p) => (
+                    <ProjectCard key={p.id} project={p} />
+                  ))}
+                </div>
+                {/* 分页 */}
+                {totalPages > 1 && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+                    <button
+                      type="button"
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                    >
+                      上一页
+                    </button>
+                    <span className="text-sm text-slate-500 px-2">
+                      {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-300 hover:text-blue-600"
+                    >
+                      下一页
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </main>
         </div>

@@ -12,12 +12,15 @@ export default function AppsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('全部');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const PAGE_SIZE = 20;
 
   useEffect(() => {
     loadApps();
     loadCategories();
-  }, [sortBy]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortBy, currentPage, activeCategory]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -26,8 +29,23 @@ export default function AppsPage() {
   const loadApps = async () => {
     setLoading(true);
     try {
-      const response = await appAPI.getAll({ sort: sortBy });
+      const params = { 
+        sort: sortBy,
+        page: currentPage,
+        pageSize: PAGE_SIZE,
+      };
+      // 添加分类筛选（如果选择了具体分类）
+      const selectedCategory = categories.find(c => c.name === activeCategory);
+      if (activeCategory !== '全部' && selectedCategory) {
+        params.category = selectedCategory.id;
+      }
+      const response = await appAPI.getAll(params);
       setApps(response.data.data);
+      const pagination = response?.data?.pagination;
+      if (pagination) {
+        setTotalItems(pagination.total);
+        setTotalPages(pagination.totalPages);
+      }
     } catch (error) {
       console.error('Failed to load apps:', error);
     } finally {
@@ -64,8 +82,8 @@ export default function AppsPage() {
     [categories],
   );
 
+  // 搜索功能改为前端过滤（因为搜索是实时输入的）
   const filteredApps = apps.filter((app) => {
-    if (activeCategory !== '全部' && (app.category_name || '其他') !== activeCategory) return false;
     if (!searchTerm.trim()) return true;
     const keyword = searchTerm.toLowerCase();
     return (
@@ -79,15 +97,8 @@ export default function AppsPage() {
     .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     .slice(0, 4);
 
-  const totalPages = Math.max(1, Math.ceil(filteredApps.length / PAGE_SIZE));
-  const paginatedFilteredApps = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredApps.slice(start, start + PAGE_SIZE);
-  }, [filteredApps, currentPage]);
-
-  useEffect(() => {
-    setCurrentPage((p) => Math.min(p, totalPages));
-  }, [totalPages]);
+  // 使用服务端分页数据
+  const paginatedFilteredApps = filteredApps;
 
   return (
     <div className="pt-16">
@@ -169,8 +180,8 @@ export default function AppsPage() {
             </div>
 
             <div className="text-sm text-slate-500 mb-4">
-              共 <span className="font-semibold text-slate-800">{filteredApps.length}</span> 个应用
-              {filteredApps.length > 0 && (
+              共 <span className="font-semibold text-slate-800">{totalItems}</span> 个应用
+              {totalItems > 0 && (
                 <span className="text-slate-400 ml-2">
                   （第 {currentPage}/{totalPages} 页，每页 {PAGE_SIZE} 个）
                 </span>
@@ -182,7 +193,7 @@ export default function AppsPage() {
                 <div className="text-center py-20">
                   <div className="text-slate-400">加载中...</div>
                 </div>
-              ) : filteredApps.length === 0 ? (
+              ) : apps.length === 0 ? (
                 <div className="text-center py-20">
                   <div className="text-slate-400">暂无应用数据</div>
                 </div>

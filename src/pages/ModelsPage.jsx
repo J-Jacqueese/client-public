@@ -32,6 +32,8 @@ export default function ModelsPage() {
     tags: true,
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const PAGE_SIZE = 20;
 
   useEffect(() => {
@@ -42,16 +44,12 @@ export default function ModelsPage() {
 
   useEffect(() => {
     loadModels();
-  }, [selectedCategory, selectedTags, selectedBaseModels, sortBy, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, selectedTags, selectedBaseModels, sortBy, searchParams, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, selectedTags, selectedBaseModels, sortBy, searchParams]);
-
-  useEffect(() => {
-    const tp = Math.max(1, Math.ceil(models.length / PAGE_SIZE));
-    setCurrentPage((p) => Math.min(p, tp));
-  }, [models.length]);
 
   const loadCategories = async () => {
     try {
@@ -136,9 +134,12 @@ export default function ModelsPage() {
         search: (searchParams.get('search') || '') || undefined,
         base_models: selectedBaseModels.length > 0 ? selectedBaseModels : undefined,
         tags: selectedTags.length > 0 ? selectedTags : undefined,
+        page: currentPage,
+        pageSize: PAGE_SIZE,
       };
       const response = await modelAPI.getAll(params);
       const data = response?.data?.data;
+      const pagination = response?.data?.pagination;
       if (Array.isArray(data)) {
         setModels(
           data.filter(
@@ -147,6 +148,10 @@ export default function ModelsPage() {
               (typeof item.id === 'number' || typeof item.id === 'string')
           )
         );
+        if (pagination) {
+          setTotalItems(pagination.total);
+          setTotalPages(pagination.totalPages);
+        }
       } else {
         console.warn('Models response data is not an array:', data);
         setModels([]);
@@ -206,11 +211,8 @@ export default function ModelsPage() {
 
   const activeFilterCount = selectedTags.length + selectedBaseModels.length + (selectedCategory !== '0' ? 1 : 0);
 
-  const totalPages = Math.max(1, Math.ceil(models.length / PAGE_SIZE));
-  const paginatedModels = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return models.slice(start, start + PAGE_SIZE);
-  }, [models, currentPage]);
+  // 使用服务端返回的分页数据，无需前端再分页
+  const paginatedModels = models;
 
   const selectedCategoryName = useMemo(() => {
     if (selectedCategory === '0') return '';
@@ -352,7 +354,7 @@ export default function ModelsPage() {
 
       <div className="container pb-16">
         <div className="flex gap-6">
-          <aside className="hidden lg:block w-64 shrink-0">
+          <aside className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-20 bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
               <SidebarContent />
             </div>
@@ -450,8 +452,8 @@ export default function ModelsPage() {
             )}
 
             <div className="text-sm text-slate-500 mb-4">
-              共找到 <span className="font-semibold text-slate-800">{models.length}</span> 个模型
-              {models.length > 0 && (
+              共找到 <span className="font-semibold text-slate-800">{totalItems}</span> 个模型
+              {totalItems > 0 && (
                 <span className="text-slate-400 ml-2">
                   （第 {currentPage}/{totalPages} 页，每页 {PAGE_SIZE} 个）
                 </span>
